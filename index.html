@@ -3861,36 +3861,92 @@
         }
       },
 
-      fireNotification(title, body, forceToast = true) {
+      async sendSystemNotification(title, options = {}) {
+        if (typeof Notification === 'undefined') {
+          return { ok: false, reason: 'المتصفح الحالي لا يدعم إشعارات النظام — استخدم منبهات .ics.' };
+        }
+        if (Notification.permission === 'denied') {
+          return { ok: false, reason: 'إذن الإشعارات مرفوض من المتصفح — فعّله من إعدادات الموقع (أيقونة القفل بجانب الرابط).' };
+        }
+        if (Notification.permission !== 'granted') {
+          return { ok: false, reason: 'لم يتم منح إذن الإشعارات بعد — اضغط «طلب الإذن» أولاً.' };
+        }
+
+        const notifOpts = {
+          body: options.body || '',
+          icon: './icon.svg',
+          badge: './icon.svg',
+          dir: 'rtl',
+          lang: 'ar',
+          vibrate: [150, 80, 150],
+          tag: options.tag || `masar-${Date.now()}`,
+          renotify: true
+        };
+
+        // Primary path for Android Chrome / Brave & installed PWAs: ServiceWorkerRegistration.showNotification
+        if ('serviceWorker' in navigator) {
+          try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && typeof reg.showNotification === 'function') {
+              await reg.showNotification(title, notifOpts);
+              return { ok: true, via: 'sw' };
+            }
+          } catch (swErr) {
+            console.warn('SW showNotification failed, trying fallback:', swErr);
+          }
+        }
+
+        // Fallback when no Service Worker is registered (e.g. local file://)
+        try {
+          new Notification(title, notifOpts);
+          return { ok: true, via: 'window' };
+        } catch (err) {
+          return {
+            ok: false,
+            reason: 'تعذّر إرسال إشعار النظام (تأكد من فتح التطبيق عبر رابط HTTPS وتثبيت الـ Service Worker).'
+          };
+        }
+      },
+
+      fireNotification(title, body, forceToast = true, tag = null) {
         const cfg = this.getSettings();
         if (cfg.sound) App.SFX.playClimbNote(4);
         if (forceToast) showToast(`${title}: ${body}`, 'amber');
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          try { new Notification(title, { body, icon: 'icon.svg', dir: 'rtl', lang: 'ar' }); } catch {}
-        }
+        this.sendSystemNotification(title, { body, tag: tag || `masar-alert-${Date.now()}` });
       },
 
       async sendTestNotification() {
         const cfg = this.getSettings();
-        if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        if (typeof Notification === 'undefined') {
+          showToast('المتصفح الحالي لا يدعم إشعارات النظام — استخدم منبهات .ics 📅', 'rose');
+          return;
+        }
+        if (Notification.permission === 'default') {
           await this.requestPermission();
         }
-        this.fireNotification('🔔 تنبيه تجريبي — لوحة المسار', 'التنبيهات تعمل بنجاح على جهازك أوفلاين 100% ✓');
+        if (Notification.permission === 'denied') {
+          showToast('إذن الإشعارات مرفوض — فعّله من إعدادات الموقع (أيقونة القفل) ثم أعد المحاولة 🔕', 'rose');
+          return;
+        }
+        if (cfg.sound) App.SFX.playClimbNote(4);
+        const res = await this.sendSystemNotification('🔔 تنبيه تجريبي — لوحة المسار', {
+          body: 'التنبيهات تعمل بنجاح على جهازك أوفلاين 100% ✓',
+          tag: 'masar-test-alert'
+        });
+        if (res.ok) {
+          showToast('تم إرسال الإشعار التجريبي بنجاح 🔔✓', 'emerald');
+        } else {
+          showToast(`تعذّر إرسال الإشعار: ${res.reason}`, 'rose');
+        }
       },
 
       notifyZenComplete(subject, mins) {
         const cfg = this.getSettings();
         if (!cfg.enabled || !cfg.types.zenComplete) return;
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          try {
-            new Notification('🎯 انتهت قعدة التركيز بنجاح!', {
-              body: `أنهيت ${mins} دقيقة في: ${subject}`,
-              icon: 'icon.svg',
-              dir: 'rtl',
-              lang: 'ar'
-            });
-          } catch {}
-        }
+        this.sendSystemNotification('🎯 انتهت قعدة التركيز بنجاح!', {
+          body: `أنهيت ${mins} دقيقة في: ${subject}`,
+          tag: 'masar-zen-complete'
+        });
       },
 
       shouldNotifyBlock(t, types) {
