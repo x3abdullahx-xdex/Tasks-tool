@@ -1,0 +1,21 @@
+{
+  "name": "لوحة المسار اليومي",
+  "short_name": "المسار",
+  "description": "لوحة متابعة يومية أوفلاين 100% — صلوات، جدول، تركيز عميق، رادار، ومزامنة سحابية.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#0b1120",
+  "theme_color": "#0b1120",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
