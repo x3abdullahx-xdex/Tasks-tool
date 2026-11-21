@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'masar-v5-cache-v1';
+const CACHE_NAME = 'masar-cache-1795263012906';
 const CORE_ASSETS = [
   './',
   './index.html',
