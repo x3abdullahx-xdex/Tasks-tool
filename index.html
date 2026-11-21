@@ -798,6 +798,95 @@
       80%  { opacity: 0.75; }
       100% { opacity: 0; transform: translate(var(--drift-x), var(--drift-y)) scale(1.1); }
     }
+
+    /* =========================================================================
+       V5: CALM MODE, MIDNIGHT EXTENSION BADGE, ALERTS & SELF-UPDATER
+    ========================================================================= */
+    body.calm-mode #quoteBannerCard,
+    body.calm-mode #rhythmBar,
+    body.calm-mode #sideColumnBento {
+      display: none !important;
+    }
+    body.calm-mode #mainColumnBento {
+      grid-column: span 12 / span 12;
+      max-width: 52rem;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hdr-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 0.75rem;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid #334155;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: border-color 0.18s, background 0.18s, transform 0.14s;
+    }
+    .hdr-icon-btn:hover { border-color: rgba(245, 158, 11, 0.55); }
+    .hdr-icon-btn:active { transform: scale(0.92); }
+    .hdr-icon-btn.is-active {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(34, 211, 238, 0.65);
+      color: #67e8f9;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
+    }
+    .hdr-icon-btn.is-calm {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: rgba(251, 191, 36, 0.65);
+      color: #fcd34d;
+    }
+    .midnight-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      color: #c7d2fe;
+      white-space: nowrap;
+    }
+    .midnight-pill.hidden { display: none; }
+    .shift-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fcd34d;
+    }
+    .shift-badge.hidden { display: none; }
+    .upd-status-box {
+      border-radius: 0.9rem;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.55;
+      border: 1px solid #334155;
+      background: #0b1120;
+      color: #cbd5e1;
+    }
+    .upd-status-box.is-ok {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.12);
+      color: #a7f3d0;
+    }
+    .upd-status-box.is-err {
+      border-color: rgba(244, 63, 94, 0.5);
+      background: rgba(244, 63, 94, 0.12);
+      color: #fecdd3;
+    }
+    .upd-status-box.hidden { display: none; }
   </style>
 </head>
 <body class="pb-24 lg:pb-12 selection:bg-amber-500/30 selection:text-amber-200">
@@ -838,11 +927,18 @@
 
         <button id="headerSyncPill" type="button" class="sync-header-pill hidden" aria-label="حالة المزامنة السحابية — اضغط للمزامنة الآن" title="اضغط للمزامنة الفورية الآن">🟢 متزامن</button>
 
+        <button id="btnCalmMode" type="button" class="hdr-icon-btn" aria-pressed="false" aria-label="تفعيل أو إيقاف الوضع الهادي" title="الوضع الهادي (إخفاء التشتت والتركيز على الـ Spotlight والجدول)">🌙</button>
+
+        <button id="btnAlertsToggle" type="button" class="hdr-icon-btn" aria-pressed="false" aria-label="تفعيل أو إيقاف تنبيهات المتصفح قبل المواعيد" title="تنبيهات قبل الباص والكلية والامتحانات بـ 15 دقيقة">🔔</button>
+
         <button id="btnSfxToggle" type="button" class="sfx-toggle-btn" aria-label="كتم أو تشغيل أصوات الإنجاز التفاعلية" title="أصوات الإنجاز التفاعلية (مستقلة عن أصوات Zen)">🔊</button>
 
         <div class="hidden xl:flex flex-col items-end px-1">
           <div id="liveClock" class="text-xs font-extrabold text-white tabular-nums" dir="ltr">--:--:--</div>
-          <div id="liveArabicDate" class="text-[10px] text-slate-400">...</div>
+          <div class="flex items-center gap-1">
+            <span id="midnightExtBadge" class="midnight-pill hidden">🌙 امتداد اليوم</span>
+            <div id="liveArabicDate" class="text-[10px] text-slate-400">...</div>
+          </div>
         </div>
 
         <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-xl px-2.5 py-1.5" title="سلسلة الالتزام">
@@ -864,7 +960,7 @@
     <section id="dailySection" class="space-y-4 sm:space-y-5 animate-fade-up">
 
       <!-- 1. FEATURED DAILY QUOTE & VERSE BANNER -->
-      <div class="rounded-2xl bg-gradient-to-l from-[#111827] via-[#152038] to-[#1e1b2e] border border-amber-500/25 p-4 sm:p-5 shadow-xl">
+      <div id="quoteBannerCard" class="rounded-2xl bg-gradient-to-l from-[#111827] via-[#152038] to-[#1e1b2e] border border-amber-500/25 p-4 sm:p-5 shadow-xl">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="space-y-1 flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
@@ -900,7 +996,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
 
         <!-- LEFT/MAIN COLUMN (7 Cols): Prayers + Day Tabs + Today's Extras + Timeline -->
-        <div class="lg:col-span-7 space-y-4">
+        <div id="mainColumnBento" class="lg:col-span-7 space-y-4">
 
           <!-- Prayer-Anchored 5 Prayers Bar -->
           <div class="glass-card rounded-2xl border border-slate-700/60 p-4">
@@ -921,6 +1017,7 @@
               <div class="flex items-center gap-2 flex-wrap">
                 <h2 id="timelineDayHeading" class="text-sm sm:text-base font-black text-white">مسار اليوم</h2>
                 <span id="viewedDatePill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">...</span>
+                <span id="timelineMidnightBadge" class="midnight-pill hidden">🌙 امتداد اليوم</span>
                 <span id="viewingOtherDayBadge" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/35">معاينة</span>
               </div>
               <div class="flex items-center gap-1.5">
@@ -941,7 +1038,7 @@
         </div>
 
         <!-- RIGHT/SIDE COLUMN (5 Cols): Interactive Monthly Calendar & Streak + Upcoming Radar + WhatsApp -->
-        <div class="lg:col-span-5 space-y-4">
+        <div id="sideColumnBento" class="lg:col-span-5 space-y-4">
 
           <!-- STREAK GAUGE + INTERACTIVE FULL MONTHLY CALENDAR + DAY INSPECTOR -->
           <div class="glass-card rounded-2xl border border-slate-700/60 p-4 sm:p-5 space-y-4">
@@ -991,9 +1088,12 @@
                     <span id="bdTasks" class="font-bold text-cyan-400 tabular-nums">0/40</span>
                   </div>
                   <div class="bg-[#0b1120] border border-slate-800 rounded-lg px-2 py-1 flex justify-between">
-                    <span class="text-slate-400">تركيز</span>
+                    <span id="bdFocusLabel" class="text-slate-400">تركيز</span>
                     <span id="bdFocus" class="font-bold text-amber-400 tabular-nums">0/15</span>
                   </div>
+                </div>
+                <div class="flex items-center justify-end">
+                  <span id="shiftBalanceBadge" class="shift-badge hidden">⚖️ ميزان يوم شيفت (مهام 55% + بونص تركيز)</span>
                 </div>
               </div>
             </div>
@@ -1380,6 +1480,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h3 class="text-sm font-black text-white">📅 مواعيد الأسبوع</h3>
           <div class="flex items-center gap-2 flex-wrap">
+            <button id="btnExportWeeklyICS" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-extrabold transition">🔔 تصدير مواعيد الباص والكلية للتقويم (.ics)</button>
             <button id="btnAutoSortDay" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 transition">⇅ ترتيب بالوقت</button>
             <button id="btnOpenAddBlock" type="button" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition">+ إضافة بلوك</button>
           </div>
@@ -1432,6 +1533,68 @@
         <p id="syncSettingsStatus" class="text-[11px] text-slate-400 leading-relaxed">
           أمان كامل: يُحفظ التوكن محلياً فقط في مفتاح منفصل ولا يُرفع أبداً داخل الـ Gist أو ملف النسخة الاحتياطية.
         </p>
+      </div>
+
+      <!-- Self-Updater Module (App.Updater — GitHub Contents API Deploy) -->
+      <div id="updaterCard" class="glass-card rounded-2xl border border-amber-500/35 p-4 sm:p-5 space-y-3.5">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h3 class="text-sm font-black text-white">🚀 التحديث الذاتي للتطبيق (GitHub Pages Self-Updater)</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">ارفع نسخة جديدة من <span dir="ltr" class="font-mono text-amber-300">index.html</span> وجدّد كاش <span dir="ltr" class="font-mono text-cyan-300">sw.js</span> تلقائياً من داخل التطبيق</p>
+          </div>
+          <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/35">Anti-Bricking Guard ✓</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label for="updOwnerInput" class="block text-xs font-bold text-slate-300 mb-1">Owner</label>
+            <input id="updOwnerInput" type="text" dir="ltr" value="x3abdullahx-xdex" class="w-full bg-[#0b1120] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-3 py-2 text-xs font-mono text-white" />
+          </div>
+          <div>
+            <label for="updRepoInput" class="block text-xs font-bold text-slate-300 mb-1">Repo</label>
+            <input id="updRepoInput" type="text" dir="ltr" value="Tasks-tool" class="w-full bg-[#0b1120] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-3 py-2 text-xs font-mono text-white" />
+          </div>
+          <div>
+            <label for="updBranchInput" class="block text-xs font-bold text-slate-300 mb-1">Branch</label>
+            <input id="updBranchInput" type="text" dir="ltr" value="main" class="w-full bg-[#0b1120] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-3 py-2 text-xs font-mono text-white" />
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-[#0b1120] border border-slate-800 p-3 space-y-2.5">
+          <label class="flex items-center gap-2 text-xs font-bold text-slate-200 cursor-pointer select-none">
+            <input id="updUseSyncToken" type="checkbox" checked class="accent-emerald-500 w-4 h-4 rounded" />
+            <span>استخدام توكن المزامنة السحابية نفسه (يتطلب صلاحية Contents: Read &amp; Write أو public_repo)</span>
+          </label>
+          <div id="updSeparateTokenWrap" class="hidden">
+            <label for="updDeployTokenInput" class="block text-xs font-bold text-slate-400 mb-1">Deploy Token منفصل (يُحفظ محلياً فقط في masar_sync_credentials)</label>
+            <div class="flex items-center gap-1.5">
+              <input id="updDeployTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-1 bg-[#111827] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-3 py-2 text-xs font-mono text-white" />
+              <button id="btnToggleDeployToken" type="button" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs flex items-center justify-center shrink-0 transition" aria-label="إظهار أو إخفاء Deploy Token" title="إظهار / إخفاء">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btnUpdPickFile" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-extrabold text-white transition">📂 اختيار ملف index.html جديد</button>
+            <input id="updHtmlFileInput" type="file" accept=".html,text/html" class="hidden" aria-label="اختيار ملف HTML للتحديث الذاتي" />
+            <span id="updFileInfo" class="text-xs text-slate-400">لم يتم اختيار ملف بعد</span>
+          </div>
+
+          <details class="rounded-xl bg-[#0b1120] border border-slate-800 overflow-hidden">
+            <summary class="px-3 py-2 text-xs font-bold text-slate-300 cursor-pointer select-none">📋 أو الصق كود HTML الجديد مباشرة (اضغط للفتح)</summary>
+            <div class="p-3 border-t border-slate-800">
+              <textarea id="updHtmlPasteInput" rows="5" dir="ltr" placeholder="<!DOCTYPE html>..." class="w-full bg-[#111827] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl p-3 text-xs font-mono text-emerald-300"></textarea>
+            </div>
+          </details>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnUpdDeploy" type="button" class="px-5 py-2.5 rounded-xl bg-gradient-to-l from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20">🚀 فحص ورفع التحديث وتجديد الكاش</button>
+          <button id="btnUpdReloadNow" type="button" class="hidden px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition">↻ إعادة تحميل الآن</button>
+        </div>
+
+        <div id="updStatusBox" class="upd-status-box hidden" role="status" aria-live="polite"></div>
       </div>
 
       <!-- JSON Backup / Sync & Reset -->
@@ -1938,8 +2101,16 @@
     }
 
     /* =========================================================================
-       3. TIMEZONE-SAFE LOCAL DATE & AFTER-MIDNIGHT TIME HELPERS
+       3. App.Time — LOGICAL DAY CUTOFF (4:00 AM) & TIMEZONE-SAFE DATE HELPERS
     ========================================================================= */
+    function getLogicalNow() {
+      return new Date(Date.now() - 4 * 3600000);
+    }
+
+    function isAfterMidnightExtension() {
+      return new Date().getHours() < 4;
+    }
+
     function formatDateKey(dateObj) {
       const y = dateObj.getFullYear();
       const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1948,13 +2119,13 @@
     }
 
     function parseDateKey(yyyyMmDd) {
-      if (!yyyyMmDd || typeof yyyyMmDd !== 'string') return new Date();
+      if (!yyyyMmDd || typeof yyyyMmDd !== 'string') return getLogicalNow();
       const [y, m, d] = yyyyMmDd.split('-').map(Number);
       return new Date(y || 2026, (m || 1) - 1, d || 1);
     }
 
     function getTodayMidnight() {
-      const n = new Date();
+      const n = getLogicalNow();
       return new Date(n.getFullYear(), n.getMonth(), n.getDate());
     }
 
@@ -2059,8 +2230,12 @@
         bestStreak: 0,
         shieldWeeksUsed: {},
         zenCheckpoint: null,
+        deletedExtraIds: [],
+        scheduleUpdatedAt: 0,
         audioPrefs: { mode: 'silent', volume: 45, muted: false },
         sfxMuted: false,
+        calmMode: false,
+        alertsEnabled: false,
         updatedAt: 0,
       };
     }
@@ -2077,6 +2252,8 @@
           identity: { ...def.identity, ...(parsed.identity || {}) },
           schedule: parsed.schedule || def.schedule,
           extraTasks: Array.isArray(parsed.extraTasks) ? parsed.extraTasks : def.extraTasks,
+          deletedExtraIds: Array.isArray(parsed.deletedExtraIds) ? parsed.deletedExtraIds : [],
+          scheduleUpdatedAt: typeof parsed.scheduleUpdatedAt === 'number' ? parsed.scheduleUpdatedAt : 0,
           history: parsed.history || {},
           distractions: Array.isArray(parsed.distractions) ? parsed.distractions : [],
           customQuotes: Array.isArray(parsed.customQuotes) ? parsed.customQuotes : [],
@@ -2085,6 +2262,8 @@
           zenCheckpoint: parsed.zenCheckpoint || null,
           audioPrefs: { ...def.audioPrefs, ...(parsed.audioPrefs || {}) },
           sfxMuted: Boolean(parsed.sfxMuted),
+          calmMode: Boolean(parsed.calmMode),
+          alertsEnabled: Boolean(parsed.alertsEnabled),
           updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : 0,
         };
       } catch (e) {
@@ -2113,7 +2292,9 @@
       if (!state.history[dateKey]) {
         state.history[dateKey] = {
           prayers: {},
+          prayersUpdatedAt: {},
           statuses: {},
+          statusesUpdatedAt: {},
           focusMinutes: 0,
           focusSessions: [],
           frozen: false,
@@ -2124,7 +2305,9 @@
       }
       const r = state.history[dateKey];
       if (!r.prayers) r.prayers = {};
+      if (!r.prayersUpdatedAt) r.prayersUpdatedAt = {};
       if (!r.statuses) r.statuses = {};
+      if (!r.statusesUpdatedAt) r.statusesUpdatedAt = {};
       if (typeof r.focusMinutes !== 'number') r.focusMinutes = 0;
       if (!Array.isArray(r.focusSessions)) r.focusSessions = [];
       return r;
@@ -2144,7 +2327,7 @@
     /* =========================================================================
        5. RUNTIME UI STATE & FEEDBACK HELPERS (TOAST, CLIPBOARD, CONFIRM)
     ========================================================================= */
-    const bootNow = new Date();
+    const bootNow = getLogicalNow();
     let currentMode = 'daily';
     let selectedWeekday = bootNow.getDay();
     let editorSelectedDay = bootNow.getDay();
@@ -2701,12 +2884,17 @@
           bestStreak: typeof cand.bestStreak === 'number' ? cand.bestStreak : 0,
           shieldWeeksUsed: cand.shieldWeeksUsed && typeof cand.shieldWeeksUsed === 'object' && !Array.isArray(cand.shieldWeeksUsed) ? cand.shieldWeeksUsed : {},
           zenCheckpoint: cand.zenCheckpoint && typeof cand.zenCheckpoint === 'object' ? cand.zenCheckpoint : null,
+          deletedExtraIds: Array.isArray(cand.deletedExtraIds) ? cand.deletedExtraIds : [],
+          scheduleUpdatedAt: typeof cand.scheduleUpdatedAt === 'number' ? cand.scheduleUpdatedAt : 0,
           audioPrefs: { ...def.audioPrefs, ...(cand.audioPrefs && typeof cand.audioPrefs === 'object' ? cand.audioPrefs : {}) },
           sfxMuted: Boolean(cand.sfxMuted),
+          calmMode: Boolean(cand.calmMode),
+          alertsEnabled: Boolean(cand.alertsEnabled),
           updatedAt: typeof cand.updatedAt === 'number' ? cand.updatedAt : Date.now()
         };
         delete normalized.token;
         delete normalized.gistId;
+        delete normalized.deployToken;
 
         return {
           valid: true,
@@ -3065,31 +3253,38 @@
             return;
           }
 
-          const cloudUpdatedAt = Number(cloudParsed.updatedAt || (cloudParsed.data && cloudParsed.data.updatedAt)) || 0;
-          const localUpdatedAt = Number(state.updatedAt) || 0;
+          const localBeforeJson = this.buildCleanCloudPayload();
+          const cloudNormJson = JSON.stringify(check.normalized, null, 2);
+          const merged = this.mergeStates(state, check.normalized, preferCloudOnFirstLink);
+          const mergedJson = JSON.stringify(merged, null, 2);
 
-          if (cloudUpdatedAt > localUpdatedAt || (preferCloudOnFirstLink && cloudUpdatedAt > 0 && localUpdatedAt === 0)) {
-            state = check.normalized;
-            state.updatedAt = cloudUpdatedAt;
+          const localChanged = mergedJson !== localBeforeJson;
+          const cloudDiffers = mergedJson !== cloudNormJson;
+
+          if (localChanged) {
+            state = merged;
             saveState(true);
             lastSpotlightSig = null;
             pickDailyQuote();
             App.SFX.syncMuteUI();
+            applyCalmModeUI();
+            App.Alerts.syncUI();
             AmbientAudio.initFromPrefs();
             initZenRecovery();
             renderDailyAll();
             if (currentMode === 'editor') renderEditor();
             if (currentMode === 'zen') renderZenSection();
-            this.setStatus('synced', formatClockHHMM(new Date()));
-            showToast('تمت المزامنة السحابية ☁️✓', 'emerald');
-          } else if (localUpdatedAt > cloudUpdatedAt) {
-            this.isBusy = false;
-            await this.pushLocalToCloud({ silent });
-            return;
-          } else {
-            this.setStatus('synced', formatClockHHMM(new Date()));
-            if (!silent) showToast('بياناتك محدّثة ومتزامنة بالفعل ☁️✓', 'emerald');
+            showToast('تمت المزامنة السحابية الذكية ☁️✓', 'emerald');
           }
+
+          if (cloudDiffers) {
+            this.isBusy = false;
+            await this.pushLocalToCloud({ silent: silent || localChanged });
+            return;
+          }
+
+          this.setStatus('synced', formatClockHHMM(new Date()));
+          if (!silent && !localChanged) showToast('بياناتك محدّثة ومتزامنة بالفعل ☁️✓', 'emerald');
         } catch (err) {
           console.warn('Cloud sync failed (offline-first fallback):', err);
           this.setStatus('offline');
@@ -3099,12 +3294,574 @@
         }
       },
 
+      mergeStates(local, cloud, preferCloudOnTie = false) {
+        const def = createInitialState();
+
+        // 1. History day-by-day merge
+        const mergedHistory = {};
+        const allDates = new Set([
+          ...Object.keys(local.history || {}),
+          ...Object.keys(cloud.history || {})
+        ]);
+        allDates.forEach(dateKey => {
+          const lRec = (local.history && local.history[dateKey]) || {};
+          const cRec = (cloud.history && cloud.history[dateKey]) || {};
+
+          const prayers = {};
+          const prayersUpdatedAt = {};
+          PRAYERS.forEach(p => {
+            const lTs = (lRec.prayersUpdatedAt && lRec.prayersUpdatedAt[p]) || 0;
+            const cTs = (cRec.prayersUpdatedAt && cRec.prayersUpdatedAt[p]) || 0;
+            const lVal = Boolean(lRec.prayers && lRec.prayers[p]);
+            const cVal = Boolean(cRec.prayers && cRec.prayers[p]);
+            if (lTs > cTs) { prayers[p] = lVal; prayersUpdatedAt[p] = lTs; }
+            else if (cTs > lTs) { prayers[p] = cVal; prayersUpdatedAt[p] = cTs; }
+            else {
+              prayers[p] = lVal || cVal;
+              if (lTs || cTs) prayersUpdatedAt[p] = Math.max(lTs, cTs);
+            }
+          });
+
+          const statuses = {};
+          const statusesUpdatedAt = {};
+          const allTaskIds = new Set([
+            ...Object.keys(lRec.statuses || {}),
+            ...Object.keys(cRec.statuses || {}),
+            ...Object.keys(lRec.statusesUpdatedAt || {}),
+            ...Object.keys(cRec.statusesUpdatedAt || {})
+          ]);
+          allTaskIds.forEach(tid => {
+            const lTs = (lRec.statusesUpdatedAt && lRec.statusesUpdatedAt[tid]) || 0;
+            const cTs = (cRec.statusesUpdatedAt && cRec.statusesUpdatedAt[tid]) || 0;
+            const lSt = lRec.statuses && lRec.statuses[tid];
+            const cSt = cRec.statuses && cRec.statuses[tid];
+            let chosen;
+            if (lTs > cTs) { chosen = lSt; statusesUpdatedAt[tid] = lTs; }
+            else if (cTs > lTs) { chosen = cSt; statusesUpdatedAt[tid] = cTs; }
+            else { chosen = (preferCloudOnTie ? (cSt || lSt) : (lSt || cSt)); }
+            if (chosen) statuses[tid] = chosen;
+          });
+
+          const sessMap = new Map();
+          [...(cRec.focusSessions || []), ...(lRec.focusSessions || [])].forEach(s => {
+            if (s && s.id && !sessMap.has(s.id)) sessMap.set(s.id, s);
+          });
+          const mergedSessions = Array.from(sessMap.values());
+          const sumSessionMins = mergedSessions.reduce((acc, s) => acc + (Number(s.minutes) || 0), 0);
+          const mergedFocusMins = mergedSessions.length > 0
+            ? Math.max(sumSessionMins, Math.min(lRec.focusMinutes || 0, cRec.focusMinutes || 0))
+            : Math.max(lRec.focusMinutes || 0, cRec.focusMinutes || 0);
+
+          mergedHistory[dateKey] = {
+            prayers,
+            prayersUpdatedAt,
+            statuses,
+            statusesUpdatedAt,
+            focusMinutes: mergedFocusMins,
+            focusSessions: mergedSessions,
+            frozen: Boolean(lRec.frozen || cRec.frozen),
+            celebratedPrayers5: Boolean(lRec.celebratedPrayers5 || cRec.celebratedPrayers5),
+            celebratedDay100: Boolean(lRec.celebratedDay100 || cRec.celebratedDay100),
+            celebrated80: Boolean(lRec.celebrated80 || cRec.celebrated80)
+          };
+        });
+
+        // 2. extraTasks + deletedExtraIds tombstones
+        const deletedSet = new Set([
+          ...(Array.isArray(local.deletedExtraIds) ? local.deletedExtraIds : []),
+          ...(Array.isArray(cloud.deletedExtraIds) ? cloud.deletedExtraIds : [])
+        ]);
+        const extraMap = new Map();
+        const ingestExtra = (item) => {
+          if (!item || !item.id || deletedSet.has(item.id)) return;
+          const prev = extraMap.get(item.id);
+          if (!prev) extraMap.set(item.id, item);
+          else {
+            const pTs = Number(prev.updatedAt) || 0;
+            const nTs = Number(item.updatedAt) || 0;
+            if (nTs > pTs || (nTs === pTs && preferCloudOnTie)) extraMap.set(item.id, item);
+          }
+        };
+        (local.extraTasks || []).forEach(ingestExtra);
+        (cloud.extraTasks || []).forEach(ingestExtra);
+
+        // 3. Union customQuotes, favoriteQuoteIds, shieldWeeksUsed, distractions
+        const quoteMap = new Map();
+        [...(local.customQuotes || []), ...(cloud.customQuotes || [])].forEach(q => {
+          if (q && q.id && !quoteMap.has(q.id)) quoteMap.set(q.id, q);
+        });
+        const favUnion = Array.from(new Set([
+          ...(Array.isArray(local.favoriteQuoteIds) ? local.favoriteQuoteIds : []),
+          ...(Array.isArray(cloud.favoriteQuoteIds) ? cloud.favoriteQuoteIds : [])
+        ]));
+        const shieldsUnion = { ...(cloud.shieldWeeksUsed || {}), ...(local.shieldWeeksUsed || {}) };
+        const disMap = new Map();
+        [...(local.distractions || []), ...(cloud.distractions || [])].forEach(d => {
+          if (d && d.id && !disMap.has(d.id)) disMap.set(d.id, d);
+        });
+
+        // 4. Schedule & Identity by scheduleUpdatedAt
+        const lSchedTs = Number(local.scheduleUpdatedAt) || 0;
+        const cSchedTs = Number(cloud.scheduleUpdatedAt) || 0;
+        const useCloudSched = cSchedTs > lSchedTs || (cSchedTs === lSchedTs && preferCloudOnTie);
+        const lUpd = Number(local.updatedAt) || 0;
+        const cUpd = Number(cloud.updatedAt) || 0;
+
+        const merged = {
+          ...def,
+          identity: useCloudSched ? { ...def.identity, ...(cloud.identity || {}) } : { ...def.identity, ...(local.identity || {}) },
+          schedule: useCloudSched ? (cloud.schedule || def.schedule) : (local.schedule || def.schedule),
+          scheduleUpdatedAt: Math.max(lSchedTs, cSchedTs),
+          extraTasks: Array.from(extraMap.values()),
+          deletedExtraIds: Array.from(deletedSet),
+          history: mergedHistory,
+          distractions: Array.from(disMap.values()),
+          customQuotes: Array.from(quoteMap.values()),
+          favoriteQuoteIds: favUnion,
+          pinnedQuoteId: cUpd > lUpd ? (cloud.pinnedQuoteId ?? null) : (local.pinnedQuoteId ?? null),
+          bestStreak: Math.max(Number(local.bestStreak) || 0, Number(cloud.bestStreak) || 0),
+          shieldWeeksUsed: shieldsUnion,
+          zenCheckpoint: local.zenCheckpoint || cloud.zenCheckpoint || null,
+          audioPrefs: { ...def.audioPrefs, ...(local.audioPrefs || {}) },
+          sfxMuted: Boolean(local.sfxMuted),
+          calmMode: Boolean(local.calmMode),
+          alertsEnabled: Boolean(local.alertsEnabled),
+          updatedAt: Math.max(lUpd, cUpd, Date.now())
+        };
+        delete merged.token;
+        delete merged.gistId;
+        delete merged.deployToken;
+        return merged;
+      },
+
       init() {
         this.renderUI();
         if (this.isConfigured()) {
           if (navigator.onLine) this.syncNow({ silent: true });
           else this.setStatus('offline');
         }
+      }
+    };
+
+    /* =========================================================================
+       5E. App.Alerts — Dual Offline Alerts (Browser Notification API + .ics Export)
+    ========================================================================= */
+    App.Alerts = {
+      notifiedMap: {},
+      lastCheckedMinuteKey: '',
+
+      syncUI() {
+        const btn = document.getElementById('btnAlertsToggle');
+        if (!btn) return;
+        const supported = typeof Notification !== 'undefined';
+        const active = supported && state.alertsEnabled && Notification.permission === 'granted';
+        btn.classList.toggle('is-active', active);
+        btn.textContent = active ? '🔔' : '🔕';
+        btn.setAttribute('aria-pressed', String(active));
+      },
+
+      async toggle() {
+        if (typeof Notification === 'undefined') {
+          showToast('المتصفح لا يدعم إشعارات النظام — يمكنك استخدام تصدير .ics للمنبه', 'amber');
+          return;
+        }
+        if (state.alertsEnabled && Notification.permission === 'granted') {
+          state.alertsEnabled = false;
+          saveState();
+          this.syncUI();
+          showToast('تم إيقاف تنبيهات المتصفح 🔕', 'cyan');
+          return;
+        }
+        let perm = Notification.permission;
+        if (perm === 'default') {
+          try { perm = await Notification.requestPermission(); } catch {}
+        }
+        if (perm === 'granted') {
+          state.alertsEnabled = true;
+          saveState();
+          this.syncUI();
+          App.SFX.playClimbNote(2);
+          showToast('تم تفعيل التنبيهات قبل الباص والكلية والامتحانات بـ 15 دقيقة 🔔', 'emerald');
+          this.checkUpcoming(true);
+        } else {
+          state.alertsEnabled = false;
+          saveState();
+          this.syncUI();
+          showToast('تم رفض إذن الإشعارات من المتصفح — استخدم تصدير .ics للمنبه', 'amber');
+        }
+      },
+
+      fireNotification(title, body) {
+        App.SFX.playClimbNote(4);
+        showToast(`${title}: ${body}`, 'amber');
+        if (typeof Notification !== 'undefined' && state.alertsEnabled && Notification.permission === 'granted') {
+          try { new Notification(title, { body, icon: 'icon.svg', dir: 'rtl', lang: 'ar' }); } catch {}
+        }
+      },
+
+      notifyZenComplete(subject, mins) {
+        if (typeof Notification !== 'undefined' && state.alertsEnabled && Notification.permission === 'granted') {
+          try {
+            new Notification('🎯 انتهت قعدة التركيز بنجاح!', {
+              body: `أنهيت ${mins} دقيقة في: ${subject}`,
+              icon: 'icon.svg',
+              dir: 'rtl',
+              lang: 'ar'
+            });
+          } catch {}
+        }
+      },
+
+      checkUpcoming(force = false) {
+        if (!state.alertsEnabled || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+        const now = new Date();
+        const minKey = `${getTodayKey()}_${now.getHours()}_${now.getMinutes()}`;
+        if (!force && minKey === this.lastCheckedMinuteKey) return;
+        this.lastCheckedMinuteKey = minKey;
+
+        const todayKey = getTodayKey();
+        let nowMins = now.getHours() * 60 + now.getMinutes();
+        if (nowMins < 240) nowMins += 1440;
+
+        getMergedTimelineForDate(todayKey).forEach(t => {
+          if (t.status !== 'pending') return;
+          const isImportant = t.category === 'مواصلات' || t.category === 'كلية' || t.category === 'امتحان' || /باص|R7/i.test(t.title || '');
+          if (!isImportant) return;
+          const diffMins = t.startMins - nowMins;
+          const flagKey = `${todayKey}|${t.id}`;
+          if (diffMins >= 1 && diffMins <= 15 && !this.notifiedMap[flagKey]) {
+            this.notifiedMap[flagKey] = true;
+            this.fireNotification(`⏰ بعد ${diffMins} دقيقة`, `${t.title} (${formatTime12Ar(t.start)})`);
+          }
+        });
+      },
+
+      escICS(str) {
+        return String(str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+      },
+
+      formatICSLocalDT(dateKey, hhmm) {
+        const cleanDate = dateKey.replace(/-/g, '');
+        const [h, m] = (hhmm || '09:00').split(':').map(n => String(Number(n) || 0).padStart(2, '0'));
+        return `${cleanDate}T${h}${m}00`;
+      },
+
+      buildAlarms() {
+        return [
+          'BEGIN:VALARM',
+          'ACTION:DISPLAY',
+          'DESCRIPTION:تنبيه قبل الموعد بـ 30 دقيقة',
+          'TRIGGER:-PT30M',
+          'END:VALARM',
+          'BEGIN:VALARM',
+          'ACTION:DISPLAY',
+          'DESCRIPTION:تنبيه قبل الموعد بـ 15 دقيقة',
+          'TRIGGER:-PT15M',
+          'END:VALARM'
+        ].join('\r\n');
+      },
+
+      downloadICS(filename, icsContent) {
+        try {
+          const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          App.SFX.playClimbNote(3);
+          showToast('تم تحميل ملف المنبه (.ics) — افتحه لإضافته لتقويم جهازك 🔔', 'emerald');
+        } catch {
+          showToast('تعذّر إنشاء ملف .ics', 'rose');
+        }
+      },
+
+      exportExtraEventICS(extraId) {
+        const item = state.extraTasks.find(x => x.id === extraId);
+        if (!item) return;
+        const startTime = item.time || '09:00';
+        const [sh, sm] = startTime.split(':').map(Number);
+        const endTotal = (sh || 9) * 60 + (sm || 0) + 60;
+        const endTime = `${String(Math.floor(endTotal / 60) % 24).padStart(2, '0')}:${String(endTotal % 60).padStart(2, '0')}`;
+        const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+        const ics = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Abdullah Masar HUD//V5//AR',
+          'CALSCALE:GREGORIAN',
+          'BEGIN:VEVENT',
+          `UID:${item.id}@abdullah-masar`,
+          `DTSTAMP:${stamp}`,
+          `DTSTART:${this.formatICSLocalDT(item.date, startTime)}`,
+          `DTEND:${this.formatICSLocalDT(item.date, endTime)}`,
+          `SUMMARY:${this.escICS(item.title)}`,
+          `DESCRIPTION:${this.escICS((item.category || '') + (item.note ? ' — ' + item.note : ''))}`,
+          this.buildAlarms(),
+          'END:VEVENT',
+          'END:VCALENDAR'
+        ].join('\r\n');
+
+        this.downloadICS(`masar-${item.date}.ics`, ics);
+      },
+
+      exportWeeklyScheduleICS() {
+        const BYDAY = { 0: 'SU', 1: 'MO', 2: 'TU', 3: 'WE', 4: 'TH', 5: 'FR', 6: 'SA' };
+        const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const events = [];
+
+        Object.keys(state.schedule || {}).forEach(dayKeyStr => {
+          const dayNum = Number(dayKeyStr);
+          const blocks = state.schedule[dayNum] || [];
+          const firstDateKey = getUpcomingDateForWeekday(dayNum);
+
+          blocks.forEach(b => {
+            const isBusOrUni = b.category === 'مواصلات' || b.category === 'كلية' || /باص|R7/i.test(b.title || '');
+            if (!isBusOrUni) return;
+            events.push([
+              'BEGIN:VEVENT',
+              `UID:weekly-${b.id}@abdullah-masar`,
+              `DTSTAMP:${stamp}`,
+              `DTSTART:${this.formatICSLocalDT(firstDateKey, b.start)}`,
+              `DTEND:${this.formatICSLocalDT(firstDateKey, b.end || b.start)}`,
+              `RRULE:FREQ=WEEKLY;BYDAY=${BYDAY[dayNum]}`,
+              `SUMMARY:${this.escICS(b.title)}`,
+              `DESCRIPTION:${this.escICS(b.note || b.category || '')}`,
+              this.buildAlarms(),
+              'END:VEVENT'
+            ].join('\r\n'));
+          });
+        });
+
+        if (events.length === 0) {
+          showToast('لا توجد مواعيد باص أو كلية في الجدول لتصديرها', 'amber');
+          return;
+        }
+
+        const ics = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Abdullah Masar HUD//Weekly V5//AR',
+          'CALSCALE:GREGORIAN',
+          ...events,
+          'END:VCALENDAR'
+        ].join('\r\n');
+
+        this.downloadICS('masar-bus-uni-weekly.ics', ics);
+      }
+    };
+
+    window.exportExtraEventICS = function(id) { App.Alerts.exportExtraEventICS(id); };
+
+    /* =========================================================================
+       5F. App.Updater — Self-Updating App via GitHub Contents API (UTF-8 Safe)
+    ========================================================================= */
+    App.Updater = {
+      loadedHtmlFromFile: '',
+      isDeploying: false,
+
+      utf8ToBase64(str) {
+        const bytes = new TextEncoder().encode(str);
+        const CHUNK = 0x8000;
+        let binary = '';
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+        }
+        return btoa(binary);
+      },
+
+      base64ToUtf8(b64) {
+        const clean = String(b64 || '').replace(/\s+/g, '');
+        const binary = atob(clean);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return new TextDecoder('utf-8').decode(bytes);
+      },
+
+      getSettings() {
+        try {
+          const raw = localStorage.getItem(App.Sync.CRED_KEY);
+          const parsed = raw ? JSON.parse(raw) : {};
+          return {
+            owner: parsed.repoOwner || 'x3abdullahx-xdex',
+            repo: parsed.repoName || 'Tasks-tool',
+            branch: parsed.repoBranch || 'main',
+            useSyncToken: parsed.useSyncToken !== false,
+            deployToken: parsed.deployToken || ''
+          };
+        } catch {
+          return { owner: 'x3abdullahx-xdex', repo: 'Tasks-tool', branch: 'main', useSyncToken: true, deployToken: '' };
+        }
+      },
+
+      saveSettings(patch) {
+        try {
+          const raw = localStorage.getItem(App.Sync.CRED_KEY);
+          const parsed = raw ? JSON.parse(raw) : {};
+          localStorage.setItem(App.Sync.CRED_KEY, JSON.stringify({ ...parsed, ...patch }));
+        } catch {}
+      },
+
+      renderUI() {
+        const cfg = this.getSettings();
+        const oEl = document.getElementById('updOwnerInput');
+        const rEl = document.getElementById('updRepoInput');
+        const bEl = document.getElementById('updBranchInput');
+        const cEl = document.getElementById('updUseSyncToken');
+        const tEl = document.getElementById('updDeployTokenInput');
+        const wEl = document.getElementById('updSeparateTokenWrap');
+        if (oEl && document.activeElement !== oEl) oEl.value = cfg.owner;
+        if (rEl && document.activeElement !== rEl) rEl.value = cfg.repo;
+        if (bEl && document.activeElement !== bEl) bEl.value = cfg.branch;
+        if (cEl) cEl.checked = cfg.useSyncToken;
+        if (tEl && document.activeElement !== tEl) tEl.value = cfg.deployToken;
+        if (wEl) wEl.classList.toggle('hidden', cfg.useSyncToken);
+      },
+
+      setStatus(msg, tone = 'info') {
+        const box = document.getElementById('updStatusBox');
+        if (!box) return;
+        box.textContent = msg;
+        box.className = `upd-status-box${tone === 'ok' ? ' is-ok' : tone === 'err' ? ' is-err' : ''}`;
+      },
+
+      validateHtmlPayload(html) {
+        const trimmed = String(html || '').trim();
+        const bytes = new TextEncoder().encode(trimmed).length;
+        if (bytes <= 10240) {
+          return { ok: false, reason: `حجم الكود صغير جداً (${(bytes / 1024).toFixed(1)} KB) — يجب أن يكون أكبر من 10 KB لحماية التطبيق.` };
+        }
+        if (!/^<!DOCTYPE\s+html>/i.test(trimmed)) return { ok: false, reason: 'الكود لا يبدأ بـ <!DOCTYPE html>.' };
+        if (!/<script[\s>]/i.test(trimmed)) return { ok: false, reason: 'الكود لا يحتوي على وسم <script.' };
+        if (!/<\/html>$/i.test(trimmed)) return { ok: false, reason: 'الكود لا ينتهي بـ </html> — تأكد من اكتمال النسخ أو الملف.' };
+        return { ok: true, bytes, hasUpdater: trimmed.includes('App.Updater') };
+      },
+
+      getActiveToken() {
+        const useSync = document.getElementById('updUseSyncToken').checked;
+        if (useSync) return App.Sync.getCredentials().token;
+        return (document.getElementById('updDeployTokenInput').value || '').trim();
+      },
+
+      async deploy() {
+        if (this.isDeploying) return;
+        const owner = (document.getElementById('updOwnerInput').value || '').trim();
+        const repo = (document.getElementById('updRepoInput').value || '').trim();
+        const branch = (document.getElementById('updBranchInput').value || '').trim() || 'main';
+        const useSyncToken = document.getElementById('updUseSyncToken').checked;
+        const deployToken = (document.getElementById('updDeployTokenInput').value || '').trim();
+        this.saveSettings({ repoOwner: owner, repoName: repo, repoBranch: branch, useSyncToken, deployToken });
+
+        const token = this.getActiveToken();
+        if (!owner || !repo) { this.setStatus('أدخل اسم المالك (Owner) واسم المستودع (Repo) أولاً.', 'err'); return; }
+        if (!token) { this.setStatus('أدخل التوكن أولاً (إما عبر المزامنة السحابية أو Deploy Token منفصل).', 'err'); return; }
+        if (!navigator.onLine) { this.setStatus('لا يوجد اتصال بالإنترنت حالياً — الرفع إلى GitHub يتطلب اتصالاً.', 'err'); return; }
+
+        const pasted = (document.getElementById('updHtmlPasteInput').value || '').trim();
+        const htmlCode = pasted || this.loadedHtmlFromFile;
+        if (!htmlCode) { this.setStatus('اختر ملف index.html جديد أو الصق الكود أولاً.', 'err'); return; }
+
+        const guard = this.validateHtmlPayload(htmlCode);
+        if (!guard.ok) { this.setStatus(`🛑 فشل فحص الأمان (Anti-Bricking): ${guard.reason}`, 'err'); return; }
+
+        const runPush = async () => {
+          this.isDeploying = true;
+          document.getElementById('btnUpdReloadNow').classList.add('hidden');
+          const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          };
+          const baseApi = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents`;
+
+          const mapHttpError = (status, fileLabel) => {
+            if (status === 401) return `خطأ 401: التوكن غير صالح أو منتهي الصلاحية عند الوصول إلى ${fileLabel}.`;
+            if (status === 403) return `خطأ 403: التوكن ينقصه صلاحية public_repo أو Contents: Read & Write لتعديل ${fileLabel}.`;
+            if (status === 404) return `خطأ 404: لم يتم العثور على ${fileLabel} — تأكد من Owner / Repo / Branch (${owner}/${repo}@${branch}).`;
+            return `خطأ GitHub (${status}) أثناء تحديث ${fileLabel}.`;
+          };
+
+          try {
+            this.setStatus('⏳ 1/4 — جارٍ جلب بيانات index.html الحالية من GitHub...');
+            let indexSha;
+            const getIdx = await fetch(`${baseApi}/index.html?ref=${encodeURIComponent(branch)}`, { headers });
+            if (getIdx.ok) {
+              const idxJson = await getIdx.json();
+              indexSha = idxJson.sha;
+            } else if (getIdx.status !== 404) {
+              throw new Error(mapHttpError(getIdx.status, 'index.html'));
+            }
+
+            this.setStatus(`⏳ 2/4 — جارٍ رفع index.html الجديد (${(guard.bytes / 1024).toFixed(1)} KB)...`);
+            const putIdxBody = {
+              message: `Self-update index.html (${new Date().toISOString()})`,
+              content: this.utf8ToBase64(htmlCode),
+              branch
+            };
+            if (indexSha) putIdxBody.sha = indexSha;
+            const putIdx = await fetch(`${baseApi}/index.html`, { method: 'PUT', headers, body: JSON.stringify(putIdxBody) });
+            if (!putIdx.ok) throw new Error(mapHttpError(putIdx.status, 'index.html'));
+
+            this.setStatus('⏳ 3/4 — جارٍ قراءة sw.js وتجديد اسم الكاش تلقائياً...');
+            const getSw = await fetch(`${baseApi}/sw.js?ref=${encodeURIComponent(branch)}`, { headers });
+            if (!getSw.ok) throw new Error(mapHttpError(getSw.status, 'sw.js'));
+            const swJson = await getSw.json();
+            const oldSwText = this.base64ToUtf8(swJson.content || '');
+            const newCacheName = `masar-cache-${Date.now()}`;
+            const updatedSwText = /CACHE_NAME\s*=\s*['"][^'"]+['"]/.test(oldSwText)
+              ? oldSwText.replace(/CACHE_NAME\s*=\s*['"][^'"]+['"]/, `CACHE_NAME = '${newCacheName}'`)
+              : `const CACHE_NAME = '${newCacheName}';\n` + oldSwText;
+
+            this.setStatus(`⏳ 4/4 — جارٍ رفع sw.js بالكاش الجديد (${newCacheName})...`);
+            const putSw = await fetch(`${baseApi}/sw.js`, {
+              method: 'PUT',
+              headers,
+              body: JSON.stringify({
+                message: `Bump sw.js cache to ${newCacheName}`,
+                content: this.utf8ToBase64(updatedSwText),
+                sha: swJson.sha,
+                branch
+              })
+            });
+            if (!putSw.ok) throw new Error(mapHttpError(putSw.status, 'sw.js'));
+
+            this.setStatus(`✅ تم رفع index.html وتحديث sw.js (${newCacheName}) بنجاح! انتظر ~30 ثانية لبناء GitHub Pages ثم اضغط «إعادة تحميل الآن».`, 'ok');
+            document.getElementById('btnUpdReloadNow').classList.remove('hidden');
+            App.SFX.playMilestoneChord();
+            showToast('تم رفع التحديث وتجديد الكاش بنجاح 🚀', 'emerald');
+          } catch (err) {
+            console.warn('Self-update error:', err);
+            this.setStatus(`❌ ${err && err.message ? err.message : 'حدث خطأ أثناء الرفع'}`, 'err');
+            showToast('فشل رفع التحديث — راجع رسالة الحالة', 'rose');
+          } finally {
+            this.isDeploying = false;
+          }
+        };
+
+        if (!guard.hasUpdater) {
+          openConfirmModal({
+            icon: '⚠️',
+            title: 'تحذير: الكود لا يحتوي على App.Updater',
+            message: 'الملف الجديد سليم لكنه لا يحتوي على وحدة التحديث الذاتي (App.Updater)، ما يعني أنك لن تستطيع التحديث من داخل التطبيق لاحقاً. هل تريد الرفع رغم ذلك؟',
+            yesText: 'نعم، ارفع التحديث',
+            onYes: runPush
+          });
+        } else {
+          runPush();
+        }
+      },
+
+      async reloadWithFreshSW() {
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(r => r.update().catch(() => {})));
+          }
+        } catch {}
+        location.reload();
       }
     };
 
@@ -3538,6 +4295,7 @@
 
       if (prev === targetStatus) {
         delete rec.statuses[taskId];
+        rec.statusesUpdatedAt[taskId] = Date.now();
         lastCompletedDomId = null;
         saveState();
         renderDailyAll();
@@ -3546,6 +4304,7 @@
       }
 
       rec.statuses[taskId] = targetStatus;
+      rec.statusesUpdatedAt[taskId] = Date.now();
       lastCompletedDomId = targetStatus === 'done' ? `routine_${taskId}` : null;
       saveState();
       const newSc = computeDayScore(todayKey);
@@ -3571,6 +4330,7 @@
       const todayKey = getTodayKey();
       const prevSc = computeDayScore(todayKey);
       item.status = item.status === targetStatus ? 'pending' : targetStatus;
+      item.updatedAt = Date.now();
       lastCompletedDomId = item.status === 'done' ? `extra_${extraId}` : null;
       saveState();
       const newSc = computeDayScore(todayKey);
@@ -3599,7 +4359,7 @@
         const ex = state.extraTasks.find(x => x.id === id);
         if (ex) title = ex.title;
       } else {
-        const list = state.schedule[selectedWeekday] || state.schedule[new Date().getDay()] || [];
+        const list = state.schedule[selectedWeekday] || state.schedule[getLogicalNow().getDay()] || [];
         const b = list.find(x => x.id === id);
         if (b) {
           title = b.title;
@@ -3642,6 +4402,7 @@
       const rec = getDayRecord(todayKey);
       const nowChecked = !rec.prayers[p];
       rec.prayers[p] = nowChecked;
+      rec.prayersUpdatedAt[p] = Date.now();
       lastCompletedDomId = nowChecked ? `prayer_${p}` : null;
       saveState();
       const newSc = computeDayScore(todayKey);
@@ -3666,7 +4427,7 @@
     };
 
     function renderDayTabs() {
-      const todayNum = new Date().getDay();
+      const todayNum = getLogicalNow().getDay();
       const viewedKey = getUpcomingDateForWeekday(selectedWeekday);
       const isToday = selectedWeekday === todayNum;
 
@@ -3879,6 +4640,7 @@
                 ${item.note ? `<div class="text-[11px] text-slate-400/90 mt-0.5">${escapeHtml(item.note)}</div>` : ''}
               </div>
               <div class="flex items-center gap-1 shrink-0">
+                <button type="button" onclick="exportExtraEventICS('${item.id}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-amber-500/20 border border-slate-700 text-amber-300 text-xs transition" aria-label="تنزيل منبه للموبايل بصيغة .ics" title="تنزيل منبه (.ics)">🔔</button>
                 <button type="button" onclick="setExtraStatus('${item.id}', 'done', event, this)" class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 hover:border-emerald-500 text-emerald-300 text-xs font-black transition" aria-label="تحديد كمكتمل" title="تم">✓</button>
                 <button type="button" onclick="openEditExtraModal('${item.id}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs transition" aria-label="تعديل" title="تعديل">✎</button>
                 <button type="button" onclick="confirmDeleteExtra('${item.id}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-rose-400 text-xs transition" aria-label="حذف" title="حذف">🗑</button>
@@ -3951,6 +4713,8 @@
         yesText: 'نعم، احذف',
         onYes: () => {
           state.extraTasks = state.extraTasks.filter(x => x.id !== id);
+          if (!Array.isArray(state.deletedExtraIds)) state.deletedExtraIds = [];
+          if (!state.deletedExtraIds.includes(id)) state.deletedExtraIds.push(id);
           saveState();
           renderDailyAll();
           showToast('تم الحذف بنجاح', 'cyan');
@@ -3961,10 +4725,16 @@
     /* =========================================================================
        12. STREAK ENGINE, RANKS & INTERACTIVE MONTHLY CALENDAR
     ========================================================================= */
+    function isShiftDayForWeekday(dayOfWeek) {
+      const routine = (state.schedule && state.schedule[dayOfWeek]) || [];
+      return routine.some(b => b && (b.category === 'عمل' || b.category === 'work'));
+    }
+
     function computeDayScore(dateKey) {
       const dayOfWeek = parseDateKey(dateKey).getDay();
       const rec = state.history[dateKey];
       const extras = getExtraTasksForDate(dateKey);
+      const isShiftDay = isShiftDayForWeekday(dayOfWeek);
 
       const prayersDone = rec ? PRAYERS.filter(p => rec.prayers && rec.prayers[p]).length : 0;
       const pScore = Math.round((prayersDone / 5) * 45);
@@ -3984,14 +4754,17 @@
 
       const totalCount = routine.length + extras.length;
       const activeCount = Math.max(0, totalCount - skipped);
-      const tScore = activeCount > 0 ? Math.round((done / activeCount) * 40) : (totalCount > 0 ? 20 : 0);
+      const taskMax = isShiftDay ? 55 : 40;
+      const tScore = activeCount > 0 ? Math.round((done / activeCount) * taskMax) : (totalCount > 0 ? Math.round(taskMax / 2) : 0);
 
       const focusMinutes = (rec && rec.focusMinutes) || 0;
-      const fScore = Math.min(15, Math.round((focusMinutes / 60) * 15));
+      const focusMax = isShiftDay ? 10 : 15;
+      const fScore = Math.min(focusMax, Math.round((focusMinutes / 60) * focusMax));
 
       return {
         total: Math.min(100, pScore + tScore + fScore),
         pScore, tScore, fScore,
+        taskMax, focusMax, isShiftDay,
         prayersDone, tasksDone: done, tasksActive: activeCount, tasksSkipped: skipped,
         focusMinutes,
         frozen: !!(rec && rec.frozen),
@@ -4067,8 +4840,12 @@
       document.getElementById('dailyScoreText').textContent = `${sc.total}%`;
       document.getElementById('dailyScoreStatus').textContent = sc.frozen ? 'محمي 🛡️' : sc.total >= 60 ? 'منجز 🔥' : 'اليوم';
       document.getElementById('bdPrayers').textContent = `${sc.pScore}/45`;
-      document.getElementById('bdTasks').textContent = `${sc.tScore}/40`;
-      document.getElementById('bdFocus').textContent = `${sc.fScore}/15`;
+      document.getElementById('bdTasks').textContent = `${sc.tScore}/${sc.taskMax}`;
+      const fLbl = document.getElementById('bdFocusLabel');
+      if (fLbl) fLbl.textContent = sc.isShiftDay ? 'بونص' : 'تركيز';
+      document.getElementById('bdFocus').textContent = sc.isShiftDay ? `+${sc.fScore}` : `${sc.fScore}/15`;
+      const sBadge = document.getElementById('shiftBalanceBadge');
+      if (sBadge) sBadge.classList.toggle('hidden', !sc.isShiftDay);
       document.getElementById('statCurrentStreak').textContent = metrics.currentStreak;
       document.getElementById('statBestStreak').textContent = metrics.bestStreak;
       const hrs = (metrics.totalFocusMins / 60).toFixed(1).replace(/\.0$/, '');
@@ -4093,7 +4870,7 @@
       }
 
       // Shield UI
-      const weekKey = getIsoWeekKey(new Date());
+      const weekKey = getIsoWeekKey(getLogicalNow());
       const usedDate = state.shieldWeeksUsed[weekKey];
       const pill = document.getElementById('shieldStatusPill');
       const btn = document.getElementById('btnActivateShield');
@@ -4225,7 +5002,7 @@
     }
 
     function triggerShieldActivation() {
-      const weekKey = getIsoWeekKey(new Date());
+      const weekKey = getIsoWeekKey(getLogicalNow());
       if (state.shieldWeeksUsed[weekKey]) {
         showToast('درع العذر مُستخدم بالفعل هذا الأسبوع', 'amber');
         return;
@@ -4834,6 +5611,7 @@
         logFocusMinutes(earned);
         clearZenCheckpoint();
         AmbientAudio.playChime();
+        App.Alerts.notifyZenComplete(document.getElementById('zenSubjectInput').value.trim() || 'قعدة مذاكرة', earned);
         startZenTitleFlash();
         document.getElementById('btnZenStartPause').textContent = '▶ ابدأ القعدة';
         document.getElementById('zenTimerStateLabel').textContent = `عاش! أنهيت القعدة (+${earned} د) ✓`;
@@ -4909,6 +5687,7 @@
     function renderEditor() {
       renderIdentity();
       if (App.Sync) App.Sync.renderUI();
+      if (App.Updater) App.Updater.renderUI();
       document.getElementById('editorCurrentDayLabel').textContent = DAY_NAMES[editorSelectedDay];
 
       document.getElementById('editorDayTabs').innerHTML = WEEKDAYS_ORDER.map(d => `
@@ -4955,7 +5734,8 @@
       const next = idx + delta;
       if (!arr || next < 0 || next >= arr.length) return;
       [arr[idx], arr[next]] = [arr[next], arr[idx]];
-      saveState();
+      state.scheduleUpdatedAt = Date.now();
+        saveState();
       renderEditor();
     };
 
@@ -4981,7 +5761,8 @@
         yesText: 'نعم، احذف',
         onYes: () => {
           state.schedule[editorSelectedDay] = (state.schedule[editorSelectedDay] || []).filter(x => x.id !== id);
-          saveState();
+          state.scheduleUpdatedAt = Date.now();
+        saveState();
           renderEditor();
           showToast('تم حذف البلوك', 'cyan');
         }
@@ -5059,9 +5840,21 @@
       const h12 = h % 12 || 12;
       const period = h >= 12 ? 'م' : 'ص';
       document.getElementById('liveClock').textContent = `${h12}:${m}:${s} ${period}`;
-      document.getElementById('liveArabicDate').textContent = formatArabicShortDate(getTodayKey());
+      const todayKey = getTodayKey();
+      document.getElementById('liveArabicDate').textContent = formatArabicShortDate(todayKey);
+
+      const isExt = isAfterMidnightExtension();
+      const extLabel = `🌙 امتداد يوم ${DAY_NAMES[getLogicalNow().getDay()]}`;
+      ['midnightExtBadge', 'timelineMidnightBadge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden', !isExt);
+        if (isExt && el.textContent !== extLabel) el.textContent = extLabel;
+      });
+
       if (currentMode === 'daily') renderSpotlight(false);
       tickZenSecond();
+      if (now.getSeconds() === 0 && App.Alerts) App.Alerts.checkUpcoming(false);
     }
 
     /* =========================================================================
@@ -5078,7 +5871,7 @@
       document.getElementById('btnTimelineAddExtra').addEventListener('click', () => openExtraModal(getUpcomingDateForWeekday(selectedWeekday)));
       document.getElementById('btnRadarQuickAdd').addEventListener('click', () => openExtraModal(getTodayKey()));
       document.getElementById('btnInspectorAddForDate').addEventListener('click', () => openExtraModal(inspectedDateKey || getTodayKey()));
-      document.getElementById('btnReturnToday').addEventListener('click', () => selectWeekday(new Date().getDay()));
+      document.getElementById('btnReturnToday').addEventListener('click', () => selectWeekday(getLogicalNow().getDay()));
 
       // Extra Task Modal Controls
       document.getElementById('btnCloseExtraModal').addEventListener('click', () => document.getElementById('extraTaskModal').classList.add('hidden'));
@@ -5111,10 +5904,10 @@
 
         if (editId) {
           const idx = state.extraTasks.findIndex(x => x.id === editId);
-          if (idx >= 0) state.extraTasks[idx] = { ...state.extraTasks[idx], ...payload };
+          if (idx >= 0) state.extraTasks[idx] = { ...state.extraTasks[idx], ...payload, updatedAt: Date.now() };
           showToast('تم تعديل الموعد بنجاح ✓', 'emerald');
         } else {
-          state.extraTasks.push({ id: 'ext_' + Date.now(), status: 'pending', ...payload });
+          state.extraTasks.push({ id: 'ext_' + Date.now(), status: 'pending', updatedAt: Date.now(), ...payload });
           showToast('تمت الإضافة للرادار والتقويم بنجاح 🎯', 'emerald');
         }
 
@@ -5348,6 +6141,7 @@
         const sub = document.getElementById('editScheduleSubtitle').value.trim();
         if (t) state.identity.title = t;
         state.identity.subtitle = sub;
+        state.scheduleUpdatedAt = Date.now();
         saveState();
         renderIdentity();
         showToast('تم حفظ اسم اللوحة ✓', 'emerald');
@@ -5356,6 +6150,7 @@
       document.getElementById('btnAutoSortDay').addEventListener('click', () => {
         state.schedule[editorSelectedDay] = (state.schedule[editorSelectedDay] || [])
           .sort((a, b) => parseLogicalMins(a.start) - parseLogicalMins(b.start));
+        state.scheduleUpdatedAt = Date.now();
         saveState();
         renderEditor();
         showToast('تم الترتيب حسب التوقيت ⇅', 'cyan');
@@ -5395,6 +6190,7 @@
         } else {
           arr.push({ id: `blk_${Date.now()}`, ...payload });
         }
+        state.scheduleUpdatedAt = Date.now();
         saveState();
         document.getElementById('blockModal').classList.add('hidden');
         renderEditor();
@@ -5412,11 +6208,52 @@
           onYes: () => {
             const src = state.schedule[editorSelectedDay] || [];
             state.schedule[target] = src.map((b, i) => ({ ...b, id: `dup_${target}_${Date.now()}_${i}` }));
-            saveState();
+            state.scheduleUpdatedAt = Date.now();
+        saveState();
             showToast(`تم نسخ جدول ${DAY_NAMES[editorSelectedDay]} إلى ${DAY_NAMES[target]} ⧉`, 'emerald');
           }
         });
       });
+
+      // Calm Mode (🌙) & Alerts (🔔) Controls
+      document.getElementById('btnCalmMode').addEventListener('click', () => {
+        state.calmMode = !state.calmMode;
+        saveState();
+        applyCalmModeUI();
+        showToast(state.calmMode ? 'تم تفعيل الوضع الهادي 🌙' : 'تمت العودة للوضع الكامل ☀️', 'cyan');
+      });
+
+      document.getElementById('btnAlertsToggle').addEventListener('click', () => App.Alerts.toggle());
+      document.getElementById('btnExportWeeklyICS').addEventListener('click', () => App.Alerts.exportWeeklyScheduleICS());
+
+      // Self-Updater (App.Updater) Controls
+      document.getElementById('updUseSyncToken').addEventListener('change', e => {
+        document.getElementById('updSeparateTokenWrap').classList.toggle('hidden', e.target.checked);
+        App.Updater.saveSettings({ useSyncToken: e.target.checked });
+      });
+      document.getElementById('btnToggleDeployToken').addEventListener('click', () => {
+        const inp = document.getElementById('updDeployTokenInput');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+      });
+      document.getElementById('btnUpdPickFile').addEventListener('click', () => {
+        const inp = document.getElementById('updHtmlFileInput');
+        inp.value = '';
+        inp.click();
+      });
+      document.getElementById('updHtmlFileInput').addEventListener('change', e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          App.Updater.loadedHtmlFromFile = String(reader.result || '');
+          document.getElementById('updFileInfo').textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          showToast(`تم تحميل ${file.name} للفحص والرفع`, 'cyan');
+        };
+        reader.onerror = () => showToast('تعذّرت قراءة ملف HTML', 'rose');
+        reader.readAsText(file, 'utf-8');
+      });
+      document.getElementById('btnUpdDeploy').addEventListener('click', () => App.Updater.deploy());
+      document.getElementById('btnUpdReloadNow').addEventListener('click', () => App.Updater.reloadWithFreshSW());
 
       // Cloud Auto-Sync (Private GitHub Gist) Controls
       document.getElementById('headerSyncPill').addEventListener('click', () => App.Sync.syncNow({ silent: false }));
@@ -5495,7 +6332,8 @@
           yesText: 'نعم، استعادة',
           onYes: () => {
             state.schedule = getDefaultSchedule();
-            saveState();
+            state.scheduleUpdatedAt = Date.now();
+        saveState();
             renderEditor();
             showToast('تمت استعادة الجدول الافتراضي ↺', 'cyan');
           }
@@ -5511,15 +6349,37 @@
       });
     }
 
+    function applyCalmModeUI() {
+      const on = Boolean(state.calmMode);
+      document.body.classList.toggle('calm-mode', on);
+      const btn = document.getElementById('btnCalmMode');
+      if (btn) {
+        btn.classList.toggle('is-calm', on);
+        btn.setAttribute('aria-pressed', String(on));
+      }
+    }
+
+    /* =========================================================================
+       19. ORGANIZED App NAMESPACE REGISTRY & BOOTSTRAP
+    ========================================================================= */
+    App.Time = { getLogicalNow, isAfterMidnightExtension, formatDateKey, parseDateKey, getTodayMidnight, getTodayKey, addDays, diffDaysFromToday };
+    App.State = { load: loadState, save: saveState, getDayRecord, getExtraTasksForDate, getDefaultSchedule, getDefaultExtraTasks };
+    App.Score = { isShiftDayForWeekday, computeDayScore, isDayQualified, calculateStreakMetrics };
+    App.Zen = { start: startZenTimer, pause: pauseZenTimer, setDuration: setZenDuration, logFocusMinutes, tickSecond: tickZenSecond };
+    App.UI = { switchMode, renderDailyAll, renderEditor, renderZenSection, showToast, openConfirmModal, applyCalmModeUI };
+
     // Boot Application
     pickDailyQuote();
     App.SFX.syncMuteUI();
+    applyCalmModeUI();
+    App.Alerts.syncUI();
     AmbientAudio.initFromPrefs();
     bindEvents();
     setZenDuration(150, false);
     initZenRecovery();
     switchMode('daily');
     App.Sync.init();
+    App.Updater.renderUI();
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
   </script>
