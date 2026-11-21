@@ -887,6 +887,155 @@
       color: #fecdd3;
     }
     .upd-status-box.hidden { display: none; }
+
+    /* =========================================================================
+       V5.1: MOBILE HEADER OVERLAP FIX, SYNC DOT BADGE, ALERTS PANEL & REMINDERS
+    ========================================================================= */
+    .header-flex-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .header-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .hdr-icon-btn,
+    .sfx-toggle-btn {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+    #btnHeaderAddExtra,
+    #headerStreakPill {
+      height: 34px;
+      padding: 0 10px;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Sync Header Pill: Desktop text + Mobile 34x34 circle with status dot */
+    .sync-header-pill {
+      height: 34px;
+      flex-shrink: 0;
+    }
+    .sync-header-pill.is-error {
+      background: rgba(244, 63, 94, 0.16);
+      border-color: rgba(244, 63, 94, 0.45);
+      color: #fda4af;
+    }
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+      flex-shrink: 0;
+    }
+    .sync-header-pill.is-offline .sync-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.65);
+    }
+    .sync-header-pill.is-syncing .sync-dot {
+      background: #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.75);
+    }
+    .sync-header-pill.is-error .sync-dot {
+      background: #f43f5e;
+      box-shadow: 0 0 8px rgba(244, 63, 94, 0.75);
+    }
+    .sync-ico {
+      font-size: 12px;
+      line-height: 1;
+      display: inline-block;
+    }
+    .sync-header-pill.is-syncing .sync-ico {
+      animation: syncSpin 1s linear infinite;
+    }
+    @keyframes syncSpin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      .sync-header-pill {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 9999px;
+        justify-content: center;
+        gap: 2px;
+      }
+      .sync-header-pill .sync-label {
+        display: none;
+      }
+      .sync-header-pill .sync-dot {
+        width: 6px;
+        height: 6px;
+      }
+    }
+
+    /* Reminder Badge on Extra Task Cards */
+    .reminder-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      color: #fcd34d;
+      white-space: nowrap;
+    }
+    .reminder-chip.is-fired {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+    .reminder-ics-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(6, 182, 212, 0.14);
+      border: 1px solid rgba(6, 182, 212, 0.38);
+      color: #67e8f9;
+      transition: background 0.15s;
+    }
+    .reminder-ics-btn:hover { background: rgba(6, 182, 212, 0.26); }
+
+    /* Alerts Control Panel Toggles */
+    .alert-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 0.75rem;
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      font-size: 12px;
+      font-weight: 700;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    .alert-toggle-row input {
+      width: 17px;
+      height: 17px;
+      accent-color: #10b981;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body class="pb-24 lg:pb-12 selection:bg-amber-500/30 selection:text-amber-200">
@@ -895,7 +1044,7 @@
   <!-- STICKY TACTICAL HEADER                                                -->
   <!-- ===================================================================== -->
   <header id="mainHeader" class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#0b1120]/90 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-3 sm:px-5 py-3 flex items-center justify-between gap-2 sm:gap-3">
+    <div class="max-w-7xl mx-auto px-3 sm:px-5 py-2.5 header-flex-bar">
 
       <!-- Editable Brand / Dashboard Identity -->
       <div class="flex items-center gap-2.5 min-w-0">
@@ -917,19 +1066,23 @@
         <button data-mode="editor" class="mode-tab-btn px-3.5 py-2 rounded-lg text-xs font-bold transition">⚙️ تعديل الجدول</button>
       </nav>
 
-      <!-- Header Right Controls: + Extra Task, Clock, Streak -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <button id="btnHeaderAddExtra" type="button" aria-label="إضافة مهمة إضافية أو امتحان" class="px-2.5 sm:px-3.5 py-2 rounded-xl bg-gradient-to-l from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center gap-1">
+      <!-- Header Right Controls: + Extra Task, Sync, Calm, Alerts, SFX, Clock, Streak -->
+      <div class="header-controls-row">
+        <button id="btnHeaderAddExtra" type="button" aria-label="إضافة مهمة إضافية أو امتحان" class="rounded-xl bg-gradient-to-l from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black transition shadow-lg shadow-amber-500/20 flex items-center gap-1">
           <span>+</span>
           <span class="hidden sm:inline">إضافة مهمة / امتحان</span>
           <span class="sm:hidden">مهمة</span>
         </button>
 
-        <button id="headerSyncPill" type="button" class="sync-header-pill hidden" aria-label="حالة المزامنة السحابية — اضغط للمزامنة الآن" title="اضغط للمزامنة الفورية الآن">🟢 متزامن</button>
+        <button id="headerSyncPill" type="button" class="sync-header-pill hidden" aria-label="حالة المزامنة السحابية — اضغط للمزامنة الآن" title="اضغط للمزامنة الفورية الآن">
+          <span class="sync-dot" aria-hidden="true"></span>
+          <span class="sync-ico" aria-hidden="true">☁️</span>
+          <span class="sync-label">متزامن</span>
+        </button>
 
         <button id="btnCalmMode" type="button" class="hdr-icon-btn" aria-pressed="false" aria-label="تفعيل أو إيقاف الوضع الهادي" title="الوضع الهادي (إخفاء التشتت والتركيز على الـ Spotlight والجدول)">🌙</button>
 
-        <button id="btnAlertsToggle" type="button" class="hdr-icon-btn" aria-pressed="false" aria-label="تفعيل أو إيقاف تنبيهات المتصفح قبل المواعيد" title="تنبيهات قبل الباص والكلية والامتحانات بـ 15 دقيقة">🔔</button>
+        <button id="btnAlertsToggle" type="button" class="hdr-icon-btn" aria-pressed="false" aria-label="فتح لوحة التحكم في الإشعارات والتنبيهات" title="لوحة التحكم في الإشعارات والتنبيهات">🔔</button>
 
         <button id="btnSfxToggle" type="button" class="sfx-toggle-btn" aria-label="كتم أو تشغيل أصوات الإنجاز التفاعلية" title="أصوات الإنجاز التفاعلية (مستقلة عن أصوات Zen)">🔊</button>
 
@@ -941,9 +1094,9 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-xl px-2.5 py-1.5" title="سلسلة الالتزام">
+        <div id="headerStreakPill" class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-xl" title="سلسلة الالتزام">
           <span class="text-sm leading-none">🔥</span>
-          <span id="headerStreakNum" class="text-xs sm:text-sm font-black text-amber-400 tabular-nums">0</span>
+          <span id="headerStreakNum" class="text-xs font-black text-amber-400 tabular-nums">0</span>
         </div>
       </div>
     </div>
@@ -1480,7 +1633,8 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h3 class="text-sm font-black text-white">📅 مواعيد الأسبوع</h3>
           <div class="flex items-center gap-2 flex-wrap">
-            <button id="btnExportWeeklyICS" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-extrabold transition">🔔 تصدير مواعيد الباص والكلية للتقويم (.ics)</button>
+            <button id="btnOpenAlertsEditor" type="button" class="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 text-xs font-extrabold transition">🔔 إعدادات التنبيهات</button>
+            <button id="btnExportWeeklyICS" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-extrabold transition">📅 تصدير مواعيد الباص والكلية (.ics)</button>
             <button id="btnAutoSortDay" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 transition">⇅ ترتيب بالوقت</button>
             <button id="btnOpenAddBlock" type="button" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition">+ إضافة بلوك</button>
           </div>
@@ -1687,6 +1841,27 @@
           <input id="extraNoteInput" type="text" placeholder="مثال: مدرج 2 / شابتر 1–3 / إحضار الكارنيه" class="w-full bg-[#0b1120] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-3.5 py-2 text-xs text-slate-200" />
         </div>
 
+        <!-- Optional Reminder Section -->
+        <div class="rounded-2xl bg-[#0b1120] border border-slate-800 p-3 space-y-2.5">
+          <label class="flex items-center justify-between gap-2 text-xs font-extrabold text-amber-300 cursor-pointer select-none">
+            <span>🔔 تذكير (اختياري)</span>
+            <input id="extraReminderToggle" type="checkbox" class="accent-emerald-500 w-4 h-4 rounded" />
+          </label>
+          <div id="extraReminderFields" class="hidden space-y-2 pt-1">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="extraReminderDate" class="block text-[10px] font-bold text-slate-400 mb-1">تاريخ التذكير</label>
+                <input id="extraReminderDate" type="date" class="w-full bg-[#111827] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-2.5 py-1.5 text-xs font-bold text-white" dir="ltr" />
+              </div>
+              <div>
+                <label for="extraReminderTime" class="block text-[10px] font-bold text-slate-400 mb-1">وقت التذكير</label>
+                <input id="extraReminderTime" type="time" class="w-full bg-[#111827] border border-slate-700 focus:border-amber-500 focus:outline-none rounded-xl px-2.5 py-1.5 text-xs font-bold text-white" dir="ltr" />
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500">سيصلك إشعار عند حلول الموعد، ويمكنك أيضاً تصديره كملف .ics لمنبه الموبايل.</p>
+          </div>
+        </div>
+
         <div class="flex items-center justify-end gap-2 pt-2">
           <button id="btnCancelExtraModal" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">إلغاء</button>
           <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition">حفظ في الرادار والتقويم ✓</button>
@@ -1820,6 +1995,68 @@
       <div class="flex justify-end gap-2">
         <button id="btnCancelImportModal" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">إلغاء</button>
         <button id="btnConfirmImport" type="button" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs">تطبيق المزامنة ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 5B: ALERTS & NOTIFICATIONS CONTROL PANEL (App.Alerts)           -->
+  <!-- ===================================================================== -->
+  <div id="alertsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="bg-[#111827] border border-cyan-500/40 rounded-3xl w-full max-w-md p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h3 class="text-base font-black text-white">🔔 لوحة التحكم في التنبيهات</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">إشعارات محلية أوفلاين 100% + منبهات .ics للموبايل</p>
+        </div>
+        <button id="btnCloseAlertsModal" type="button" aria-label="إغلاق لوحة التنبيهات" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">✕</button>
+      </div>
+
+      <!-- Master Toggle & Browser Permission Status -->
+      <div class="rounded-2xl bg-[#0b1120] border border-slate-800 p-3.5 space-y-2.5">
+        <label class="flex items-center justify-between gap-2 text-xs font-extrabold text-white cursor-pointer select-none">
+          <span>تفعيل الإشعارات والتنبيهات</span>
+          <input id="alertMasterToggle" type="checkbox" class="accent-emerald-500 w-4 h-4 rounded" />
+        </label>
+        <div class="flex items-center justify-between flex-wrap gap-2 pt-1.5 border-t border-slate-800 text-[11px]">
+          <span class="text-slate-400">إذن المتصفح: <strong id="alertPermBadge" class="text-amber-300">...</strong></span>
+          <button id="btnAlertRequestPerm" type="button" class="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 font-bold text-[11px] transition">طلب الإذن 🔔</button>
+        </div>
+      </div>
+
+      <!-- Lead Time Selector -->
+      <div class="space-y-2">
+        <div class="text-xs font-extrabold text-slate-300">وقت التنبيه المسبق لبلوكات الجدول:</div>
+        <div id="alertLeadGrid" class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" data-lead="0" class="alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition">عند الموعد</button>
+          <button type="button" data-lead="5" class="alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition">قبل 5 د</button>
+          <button type="button" data-lead="10" class="alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition">قبل 10 د</button>
+          <button type="button" data-lead="15" class="alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition">قبل 15 د</button>
+          <button type="button" data-lead="30" class="alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition">قبل 30 د</button>
+        </div>
+      </div>
+
+      <!-- Category Toggles -->
+      <div class="space-y-1.5">
+        <div class="text-xs font-extrabold text-slate-300 mb-1">أنواع التنبيهات المفعّلة:</div>
+        <label class="alert-toggle-row"><span>🚌 المواصلات والباص (R7)</span><input id="alertTypeTransport" type="checkbox" /></label>
+        <label class="alert-toggle-row"><span>🎓 الكلية والمحاضرات والامتحانات</span><input id="alertTypeUniExam" type="checkbox" /></label>
+        <label class="alert-toggle-row"><span>💼 الشيفت / العمل</span><input id="alertTypeWork" type="checkbox" /></label>
+        <label class="alert-toggle-row"><span>📚 بلوكات المذاكرة والشخصي</span><input id="alertTypeStudyPersonal" type="checkbox" /></label>
+        <label class="alert-toggle-row"><span>📌 تذكيرات المهام الإضافية (+ مهمة)</span><input id="alertTypeExtraReminders" type="checkbox" /></label>
+        <label class="alert-toggle-row"><span>🎯 انتهاء جلسة التركيز (Zen Focus)</span><input id="alertTypeZenComplete" type="checkbox" /></label>
+      </div>
+
+      <!-- Sound Toggle -->
+      <label class="alert-toggle-row" style="border-color:rgba(245,158,11,0.35);">
+        <span>🔊 صوت نغمة التنبيه (App.SFX)</span>
+        <input id="alertSoundToggle" type="checkbox" />
+      </label>
+
+      <!-- Test & Close -->
+      <div class="flex items-center justify-between gap-2 pt-1">
+        <button id="btnAlertTestNow" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-extrabold text-xs transition">🔔 تجربة إشعار الآن</button>
+        <button id="btnDoneAlertsModal" type="button" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition">تم ✓</button>
       </div>
     </div>
   </div>
@@ -2236,6 +2473,19 @@
         sfxMuted: false,
         calmMode: false,
         alertsEnabled: false,
+        alertSettings: {
+          enabled: false,
+          leadMinutes: 15,
+          sound: true,
+          types: {
+            transport: true,
+            uniExam: true,
+            work: false,
+            studyPersonal: false,
+            extraReminders: true,
+            zenComplete: true
+          }
+        },
         updatedAt: 0,
       };
     }
@@ -2264,6 +2514,17 @@
           sfxMuted: Boolean(parsed.sfxMuted),
           calmMode: Boolean(parsed.calmMode),
           alertsEnabled: Boolean(parsed.alertsEnabled),
+          alertSettings: {
+            ...def.alertSettings,
+            ...(parsed.alertSettings && typeof parsed.alertSettings === 'object' ? parsed.alertSettings : {}),
+            enabled: parsed.alertSettings && typeof parsed.alertSettings.enabled === 'boolean'
+              ? parsed.alertSettings.enabled
+              : Boolean(parsed.alertsEnabled),
+            types: {
+              ...def.alertSettings.types,
+              ...(parsed.alertSettings && parsed.alertSettings.types && typeof parsed.alertSettings.types === 'object' ? parsed.alertSettings.types : {})
+            }
+          },
           updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : 0,
         };
       } catch (e) {
@@ -2890,6 +3151,14 @@
           sfxMuted: Boolean(cand.sfxMuted),
           calmMode: Boolean(cand.calmMode),
           alertsEnabled: Boolean(cand.alertsEnabled),
+          alertSettings: {
+            ...def.alertSettings,
+            ...(cand.alertSettings && typeof cand.alertSettings === 'object' ? cand.alertSettings : {}),
+            types: {
+              ...def.alertSettings.types,
+              ...(cand.alertSettings && cand.alertSettings.types && typeof cand.alertSettings.types === 'object' ? cand.alertSettings.types : {})
+            }
+          },
           updatedAt: typeof cand.updatedAt === 'number' ? cand.updatedAt : Date.now()
         };
         delete normalized.token;
@@ -3030,19 +3299,28 @@
         const creds = this.getCredentials();
         const configured = Boolean(creds.token && creds.gistId);
 
-        // Header calm status pill (visible ONLY when configured)
+        // Header calm status pill (Desktop: full label, Mobile: 34x34 circular dot + icon)
         const pill = document.getElementById('headerSyncPill');
         if (pill) {
           pill.classList.toggle('hidden', !configured);
-          pill.classList.remove('is-syncing', 'is-offline');
+          pill.classList.remove('is-syncing', 'is-offline', 'is-error');
+          const icoEl = pill.querySelector('.sync-ico');
+          const lblEl = pill.querySelector('.sync-label');
           if (this.status === 'syncing') {
-            pill.textContent = '🔄 جاري المزامنة';
             pill.classList.add('is-syncing');
+            if (icoEl) icoEl.textContent = '↻';
+            if (lblEl) lblEl.textContent = 'جاري المزامنة';
+          } else if (this.status === 'error') {
+            pill.classList.add('is-error');
+            if (icoEl) icoEl.textContent = '☁️';
+            if (lblEl) lblEl.textContent = 'خطأ مزامنة';
           } else if (this.status === 'offline' || !navigator.onLine) {
-            pill.textContent = '☁️ أوفلاين';
             pill.classList.add('is-offline');
+            if (icoEl) icoEl.textContent = '☁️';
+            if (lblEl) lblEl.textContent = 'أوفلاين';
           } else {
-            pill.textContent = '🟢 متزامن';
+            if (icoEl) icoEl.textContent = '☁️';
+            if (lblEl) lblEl.textContent = 'متزامن';
           }
         }
 
@@ -3287,7 +3565,7 @@
           if (!silent && !localChanged) showToast('بياناتك محدّثة ومتزامنة بالفعل ☁️✓', 'emerald');
         } catch (err) {
           console.warn('Cloud sync failed (offline-first fallback):', err);
-          this.setStatus('offline');
+          this.setStatus(navigator.onLine ? 'error' : 'offline');
         } finally {
           this.isBusy = false;
           this.renderUI();
@@ -3375,11 +3653,23 @@
         const ingestExtra = (item) => {
           if (!item || !item.id || deletedSet.has(item.id)) return;
           const prev = extraMap.get(item.id);
-          if (!prev) extraMap.set(item.id, item);
-          else {
+          if (!prev) {
+            extraMap.set(item.id, {
+              ...item,
+              reminderAt: item.reminderAt || null,
+              reminderFired: Boolean(item.reminderFired)
+            });
+          } else {
             const pTs = Number(prev.updatedAt) || 0;
             const nTs = Number(item.updatedAt) || 0;
-            if (nTs > pTs || (nTs === pTs && preferCloudOnTie)) extraMap.set(item.id, item);
+            const winner = (nTs > pTs || (nTs === pTs && preferCloudOnTie)) ? item : prev;
+            const other = winner === item ? prev : item;
+            const sameReminder = winner.reminderAt && winner.reminderAt === other.reminderAt;
+            extraMap.set(item.id, {
+              ...winner,
+              reminderAt: winner.reminderAt || null,
+              reminderFired: sameReminder ? Boolean(winner.reminderFired || other.reminderFired) : Boolean(winner.reminderFired)
+            });
           }
         };
         (local.extraTasks || []).forEach(ingestExtra);
@@ -3426,6 +3716,7 @@
           sfxMuted: Boolean(local.sfxMuted),
           calmMode: Boolean(local.calmMode),
           alertsEnabled: Boolean(local.alertsEnabled),
+          alertSettings: local.alertSettings || cloud.alertSettings || def.alertSettings,
           updatedAt: Math.max(lUpd, cUpd, Date.now())
         };
         delete merged.token;
@@ -3444,63 +3735,153 @@
     };
 
     /* =========================================================================
-       5E. App.Alerts — Dual Offline Alerts (Browser Notification API + .ics Export)
+       5E. App.Alerts — Control Panel, Per-Category Alerts, Extra Reminders & .ics
     ========================================================================= */
     App.Alerts = {
       notifiedMap: {},
       lastCheckedMinuteKey: '',
 
-      syncUI() {
-        const btn = document.getElementById('btnAlertsToggle');
-        if (!btn) return;
-        const supported = typeof Notification !== 'undefined';
-        const active = supported && state.alertsEnabled && Notification.permission === 'granted';
-        btn.classList.toggle('is-active', active);
-        btn.textContent = active ? '🔔' : '🔕';
-        btn.setAttribute('aria-pressed', String(active));
+      getSettings() {
+        const def = createInitialState().alertSettings;
+        if (!state.alertSettings || typeof state.alertSettings !== 'object') {
+          state.alertSettings = { ...def, types: { ...def.types } };
+        }
+        if (!state.alertSettings.types) state.alertSettings.types = { ...def.types };
+        return state.alertSettings;
       },
 
-      async toggle() {
-        if (typeof Notification === 'undefined') {
-          showToast('المتصفح لا يدعم إشعارات النظام — يمكنك استخدام تصدير .ics للمنبه', 'amber');
-          return;
+      isActive() {
+        const cfg = this.getSettings();
+        return Boolean(cfg.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted');
+      },
+
+      syncUI() {
+        const cfg = this.getSettings();
+        const supported = typeof Notification !== 'undefined';
+        const perm = supported ? Notification.permission : 'unsupported';
+        const active = this.isActive();
+
+        const btn = document.getElementById('btnAlertsToggle');
+        if (btn) {
+          btn.classList.toggle('is-active', active);
+          btn.textContent = active ? '🔔' : '🔕';
+          btn.setAttribute('aria-pressed', String(active));
         }
-        if (state.alertsEnabled && Notification.permission === 'granted') {
-          state.alertsEnabled = false;
-          saveState();
-          this.syncUI();
-          showToast('تم إيقاف تنبيهات المتصفح 🔕', 'cyan');
-          return;
+
+        // Control Panel Modal fields
+        const master = document.getElementById('alertMasterToggle');
+        if (master) master.checked = Boolean(cfg.enabled);
+
+        const permBadge = document.getElementById('alertPermBadge');
+        const reqBtn = document.getElementById('btnAlertRequestPerm');
+        if (permBadge) {
+          if (perm === 'granted') { permBadge.textContent = 'ممنوح ✓'; permBadge.className = 'text-emerald-400'; }
+          else if (perm === 'denied') { permBadge.textContent = 'مرفوض من المتصفح ✕'; permBadge.className = 'text-rose-400'; }
+          else if (perm === 'default') { permBadge.textContent = 'بانتظار الإذن'; permBadge.className = 'text-amber-300'; }
+          else { permBadge.textContent = 'غير مدعوم'; permBadge.className = 'text-slate-400'; }
+        }
+        if (reqBtn) reqBtn.classList.toggle('hidden', perm === 'granted' || perm === 'unsupported');
+
+        document.querySelectorAll('.alert-lead-btn').forEach(b => {
+          const sel = Number(b.dataset.lead) === Number(cfg.leadMinutes);
+          b.className = `alert-lead-btn px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition ${
+            sel ? 'bg-amber-500/20 border-amber-400 text-amber-200' : 'bg-[#0b1120] border-slate-800 text-slate-400 hover:text-white'
+          }`;
+        });
+
+        const setChk = (id, val) => { const e = document.getElementById(id); if (e) e.checked = Boolean(val); };
+        setChk('alertTypeTransport', cfg.types.transport);
+        setChk('alertTypeUniExam', cfg.types.uniExam);
+        setChk('alertTypeWork', cfg.types.work);
+        setChk('alertTypeStudyPersonal', cfg.types.studyPersonal);
+        setChk('alertTypeExtraReminders', cfg.types.extraReminders);
+        setChk('alertTypeZenComplete', cfg.types.zenComplete);
+        setChk('alertSoundToggle', cfg.sound);
+      },
+
+      openPanel() {
+        this.syncUI();
+        document.getElementById('alertsModal').classList.remove('hidden');
+      },
+
+      closePanel() {
+        document.getElementById('alertsModal').classList.add('hidden');
+      },
+
+      async requestPermission() {
+        if (typeof Notification === 'undefined') {
+          showToast('المتصفح لا يدعم إشعارات النظام — استخدم تصدير .ics للمنبه', 'amber');
+          return false;
         }
         let perm = Notification.permission;
         if (perm === 'default') {
           try { perm = await Notification.requestPermission(); } catch {}
         }
         if (perm === 'granted') {
+          const cfg = this.getSettings();
+          cfg.enabled = true;
           state.alertsEnabled = true;
           saveState();
           this.syncUI();
-          App.SFX.playClimbNote(2);
-          showToast('تم تفعيل التنبيهات قبل الباص والكلية والامتحانات بـ 15 دقيقة 🔔', 'emerald');
+          if (cfg.sound) App.SFX.playClimbNote(2);
+          showToast('تم منح إذن التنبيهات وتفعيلها بنجاح 🔔', 'emerald');
           this.checkUpcoming(true);
+          return true;
+        }
+        this.syncUI();
+        showToast('تم رفض الإذن من المتصفح — يمكنك استخدام منبهات .ics', 'amber');
+        return false;
+      },
+
+      async setMasterEnabled(on) {
+        const cfg = this.getSettings();
+        if (on) {
+          if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+            const ok = await this.requestPermission();
+            if (!ok) {
+              cfg.enabled = false;
+              state.alertsEnabled = false;
+              saveState();
+              this.syncUI();
+              return;
+            }
+          } else {
+            cfg.enabled = true;
+            state.alertsEnabled = true;
+            saveState();
+            this.syncUI();
+            this.checkUpcoming(true);
+          }
         } else {
+          cfg.enabled = false;
           state.alertsEnabled = false;
           saveState();
           this.syncUI();
-          showToast('تم رفض إذن الإشعارات من المتصفح — استخدم تصدير .ics للمنبه', 'amber');
+          showToast('تم إيقاف التنبيهات مؤقتاً 🔕', 'cyan');
         }
       },
 
-      fireNotification(title, body) {
-        App.SFX.playClimbNote(4);
-        showToast(`${title}: ${body}`, 'amber');
-        if (typeof Notification !== 'undefined' && state.alertsEnabled && Notification.permission === 'granted') {
+      fireNotification(title, body, forceToast = true) {
+        const cfg = this.getSettings();
+        if (cfg.sound) App.SFX.playClimbNote(4);
+        if (forceToast) showToast(`${title}: ${body}`, 'amber');
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           try { new Notification(title, { body, icon: 'icon.svg', dir: 'rtl', lang: 'ar' }); } catch {}
         }
       },
 
+      async sendTestNotification() {
+        const cfg = this.getSettings();
+        if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+          await this.requestPermission();
+        }
+        this.fireNotification('🔔 تنبيه تجريبي — لوحة المسار', 'التنبيهات تعمل بنجاح على جهازك أوفلاين 100% ✓');
+      },
+
       notifyZenComplete(subject, mins) {
-        if (typeof Notification !== 'undefined' && state.alertsEnabled && Notification.permission === 'granted') {
+        const cfg = this.getSettings();
+        if (!cfg.enabled || !cfg.types.zenComplete) return;
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           try {
             new Notification('🎯 انتهت قعدة التركيز بنجاح!', {
               body: `أنهيت ${mins} دقيقة في: ${subject}`,
@@ -3512,8 +3893,18 @@
         }
       },
 
+      shouldNotifyBlock(t, types) {
+        if (/باص|R7/i.test(t.title || '') || t.category === 'مواصلات') return Boolean(types.transport);
+        if (t.category === 'كلية' || t.category === 'امتحان') return Boolean(types.uniExam);
+        if (t.category === 'عمل' || t.category === 'work') return Boolean(types.work);
+        if (t.category === 'مذاكرة' || t.category === 'شخصي' || t.category === 'routine') return Boolean(types.studyPersonal);
+        return false;
+      },
+
       checkUpcoming(force = false) {
-        if (!state.alertsEnabled || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+        const cfg = this.getSettings();
+        if (!cfg.enabled) return;
+
         const now = new Date();
         const minKey = `${getTodayKey()}_${now.getHours()}_${now.getMinutes()}`;
         if (!force && minKey === this.lastCheckedMinuteKey) return;
@@ -3522,18 +3913,42 @@
         const todayKey = getTodayKey();
         let nowMins = now.getHours() * 60 + now.getMinutes();
         if (nowMins < 240) nowMins += 1440;
+        const lead = Math.max(0, Number(cfg.leadMinutes) || 0);
 
+        // 1. Check Today's Scheduled Timeline Blocks
         getMergedTimelineForDate(todayKey).forEach(t => {
           if (t.status !== 'pending') return;
-          const isImportant = t.category === 'مواصلات' || t.category === 'كلية' || t.category === 'امتحان' || /باص|R7/i.test(t.title || '');
-          if (!isImportant) return;
+          if (!this.shouldNotifyBlock(t, cfg.types)) return;
           const diffMins = t.startMins - nowMins;
-          const flagKey = `${todayKey}|${t.id}`;
-          if (diffMins >= 1 && diffMins <= 15 && !this.notifiedMap[flagKey]) {
+          const inWindow = lead === 0 ? (diffMins === 0) : (diffMins >= 0 && diffMins <= lead);
+          const flagKey = `${todayKey}|${t.id}|${lead}`;
+          if (inWindow && !this.notifiedMap[flagKey]) {
             this.notifiedMap[flagKey] = true;
-            this.fireNotification(`⏰ بعد ${diffMins} دقيقة`, `${t.title} (${formatTime12Ar(t.start)})`);
+            const whenTxt = diffMins === 0 ? 'حان الموعد الآن' : `بعد ${diffMins} دقيقة`;
+            this.fireNotification(`⏰ ${whenTxt}`, `${t.title} (${formatTime12Ar(t.start)})`);
           }
         });
+
+        // 2. Check Extra Task Custom Reminders (reminderAt)
+        if (cfg.types.extraReminders) {
+          const nowMs = Date.now();
+          let anyFired = false;
+          (state.extraTasks || []).forEach(item => {
+            if (!item || item.status === 'done' || !item.reminderAt || item.reminderFired) return;
+            const targetMs = new Date(item.reminderAt).getTime();
+            if (!Number.isFinite(targetMs)) return;
+            if (nowMs >= targetMs) {
+              item.reminderFired = true;
+              item.updatedAt = nowMs;
+              anyFired = true;
+              this.fireNotification(`🔔 تذكير: ${item.title}`, item.note || `موعدك المسجّل (${formatArabicShortDate(item.date)})`);
+            }
+          });
+          if (anyFired) {
+            saveState();
+            if (currentMode === 'daily') renderDailyAll();
+          }
+        }
       },
 
       escICS(str) {
@@ -3546,19 +3961,23 @@
         return `${cleanDate}T${h}${m}00`;
       },
 
-      buildAlarms() {
-        return [
+      formatICSFromDateObj(d) {
+        const y = d.getFullYear();
+        const mo = String(d.getMonth() + 1).padStart(2, '0');
+        const da = String(d.getDate()).padStart(2, '0');
+        const h = String(d.getHours()).padStart(2, '0');
+        const mi = String(d.getMinutes()).padStart(2, '0');
+        return `${y}${mo}${da}T${h}${mi}00`;
+      },
+
+      buildAlarms(triggers = ['-PT30M', '-PT15M']) {
+        return triggers.map(tr => [
           'BEGIN:VALARM',
           'ACTION:DISPLAY',
-          'DESCRIPTION:تنبيه قبل الموعد بـ 30 دقيقة',
-          'TRIGGER:-PT30M',
-          'END:VALARM',
-          'BEGIN:VALARM',
-          'ACTION:DISPLAY',
-          'DESCRIPTION:تنبيه قبل الموعد بـ 15 دقيقة',
-          'TRIGGER:-PT15M',
+          `DESCRIPTION:تنبيه موعد (${tr})`,
+          `TRIGGER:${tr}`,
           'END:VALARM'
-        ].join('\r\n');
+        ].join('\r\n')).join('\r\n');
       },
 
       downloadICS(filename, icsContent) {
@@ -3573,20 +3992,33 @@
           document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(url), 1000);
           App.SFX.playClimbNote(3);
-          showToast('تم تحميل ملف المنبه (.ics) — افتحه لإضافته لتقويم جهازك 🔔', 'emerald');
+          showToast('تم تحميل ملف المنبه (.ics) — افتحه لإضافته لتقويم جهازك 📅', 'emerald');
         } catch {
           showToast('تعذّر إنشاء ملف .ics', 'rose');
         }
       },
 
-      exportExtraEventICS(extraId) {
+      exportExtraEventICS(extraId, useReminderTime = false) {
         const item = state.extraTasks.find(x => x.id === extraId);
         if (!item) return;
-        const startTime = item.time || '09:00';
-        const [sh, sm] = startTime.split(':').map(Number);
-        const endTotal = (sh || 9) * 60 + (sm || 0) + 60;
-        const endTime = `${String(Math.floor(endTotal / 60) % 24).padStart(2, '0')}:${String(endTotal % 60).padStart(2, '0')}`;
         const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        let dtStart, dtEnd, alarms;
+
+        if (useReminderTime && item.reminderAt) {
+          const dStart = new Date(item.reminderAt);
+          const dEnd = new Date(dStart.getTime() + 30 * 60000);
+          dtStart = this.formatICSFromDateObj(dStart);
+          dtEnd = this.formatICSFromDateObj(dEnd);
+          alarms = this.buildAlarms(['PT0M', '-PT10M']);
+        } else {
+          const startTime = item.time || '09:00';
+          const [sh, sm] = startTime.split(':').map(Number);
+          const endTotal = (sh || 9) * 60 + (sm || 0) + 60;
+          const endTime = `${String(Math.floor(endTotal / 60) % 24).padStart(2, '0')}:${String(endTotal % 60).padStart(2, '0')}`;
+          dtStart = this.formatICSLocalDT(item.date, startTime);
+          dtEnd = this.formatICSLocalDT(item.date, endTime);
+          alarms = this.buildAlarms(['-PT30M', '-PT15M']);
+        }
 
         const ics = [
           'BEGIN:VCALENDAR',
@@ -3594,18 +4026,18 @@
           'PRODID:-//Abdullah Masar HUD//V5//AR',
           'CALSCALE:GREGORIAN',
           'BEGIN:VEVENT',
-          `UID:${item.id}@abdullah-masar`,
+          `UID:${item.id}${useReminderTime ? '-rem' : ''}@abdullah-masar`,
           `DTSTAMP:${stamp}`,
-          `DTSTART:${this.formatICSLocalDT(item.date, startTime)}`,
-          `DTEND:${this.formatICSLocalDT(item.date, endTime)}`,
+          `DTSTART:${dtStart}`,
+          `DTEND:${dtEnd}`,
           `SUMMARY:${this.escICS(item.title)}`,
           `DESCRIPTION:${this.escICS((item.category || '') + (item.note ? ' — ' + item.note : ''))}`,
-          this.buildAlarms(),
+          alarms,
           'END:VEVENT',
           'END:VCALENDAR'
         ].join('\r\n');
 
-        this.downloadICS(`masar-${item.date}.ics`, ics);
+        this.downloadICS(`masar-${useReminderTime ? 'reminder-' : ''}${item.date}.ics`, ics);
       },
 
       exportWeeklyScheduleICS() {
@@ -3630,7 +4062,7 @@
               `RRULE:FREQ=WEEKLY;BYDAY=${BYDAY[dayNum]}`,
               `SUMMARY:${this.escICS(b.title)}`,
               `DESCRIPTION:${this.escICS(b.note || b.category || '')}`,
-              this.buildAlarms(),
+              this.buildAlarms(['-PT30M', '-PT15M']),
               'END:VEVENT'
             ].join('\r\n'));
           });
@@ -3654,7 +4086,22 @@
       }
     };
 
-    window.exportExtraEventICS = function(id) { App.Alerts.exportExtraEventICS(id); };
+    window.exportExtraEventICS = function(id) { App.Alerts.exportExtraEventICS(id, false); };
+    window.exportExtraReminderICS = function(id) { App.Alerts.exportExtraEventICS(id, true); };
+
+    function renderReminderBadgeHtml(item) {
+      if (!item || !item.reminderAt) return '';
+      const d = new Date(item.reminderAt);
+      if (isNaN(d.getTime())) return '';
+      const dk = formatDateKey(d);
+      const timeTxt = formatClockHHMM(d);
+      const dateTxt = dk === getTodayKey() ? 'اليوم' : `${d.getDate()} ${ARABIC_MONTHS[d.getMonth()]}`;
+      return `
+        <span class="inline-flex items-center gap-1">
+          <button type="button" onclick="openEditExtraModal('${item.id}')" class="reminder-chip ${item.reminderFired ? 'is-fired' : ''}" title="تعديل أو إلغاء التذكير">🔔 ${dateTxt} ${timeTxt}</button>
+          <button type="button" onclick="exportExtraReminderICS('${item.id}')" class="reminder-ics-btn" aria-label="تنزيل منبه التذكير للتقويم (.ics)" title="إضافة التذكير لتقويم الموبايل (.ics)">📅</button>
+        </span>`;
+    }
 
     /* =========================================================================
        5F. App.Updater — Self-Updating App via GitHub Contents API (UTF-8 Safe)
@@ -4486,6 +4933,7 @@
                     <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${ec.bg} ${ec.text} border ${ec.border}">${ec.label}</span>
                     ${e.time ? `<span class="text-[10px] font-bold text-cyan-300 tabular-nums">⏰ ${formatTime12Ar(e.time)}</span>` : `<span class="text-[10px] text-slate-400">طوال اليوم</span>`}
                     ${e.priority === 'high' ? `<span class="text-[10px] font-black text-rose-300">🔥 مهم</span>` : ''}
+                    ${renderReminderBadgeHtml(e)}
                     ${st === 'skipped' ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">تخطّي</span>` : ''}
                   </div>
                   <div class="text-xs sm:text-sm font-extrabold mt-1 ${st === 'done' ? 'line-through text-emerald-300/70' : st === 'skipped' ? 'line-through text-slate-500' : 'text-white'}">${escapeHtml(e.title)}</div>
@@ -4631,6 +5079,7 @@
                   <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${cd.cls} tabular-nums">${cd.text}</span>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${ec.bg} ${ec.text} border ${ec.border}">${ec.label}</span>
                   ${item.priority === 'high' ? `<span class="text-[10px] font-black text-rose-300">🔥</span>` : ''}
+                  ${renderReminderBadgeHtml(item)}
                 </div>
                 <div class="text-xs sm:text-sm font-extrabold text-white mt-1">${escapeHtml(item.title)}</div>
                 <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
@@ -4675,13 +5124,28 @@
       });
     }
 
+    function getDefaultReminderDateTime(fallbackDateKey) {
+      const now = new Date();
+      const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0);
+      return {
+        date: fallbackDateKey || formatDateKey(nextHour),
+        time: `${String(nextHour.getHours()).padStart(2, '0')}:00`
+      };
+    }
+
     function openExtraModal(presetDateKey = null, presetTitle = '', presetCat = 'امتحان') {
       document.getElementById('extraModalHeading').textContent = '➕ إضافة مهمة إضافية / امتحان';
       document.getElementById('extraEditId').value = '';
       document.getElementById('extraTitleInput').value = presetTitle;
-      document.getElementById('extraDateInput').value = presetDateKey || getUpcomingDateForWeekday(selectedWeekday);
+      const targetDate = presetDateKey || getUpcomingDateForWeekday(selectedWeekday);
+      document.getElementById('extraDateInput').value = targetDate;
       document.getElementById('extraTimeInput').value = '';
       document.getElementById('extraNoteInput').value = '';
+      const defRem = getDefaultReminderDateTime(targetDate);
+      document.getElementById('extraReminderToggle').checked = false;
+      document.getElementById('extraReminderDate').value = defRem.date;
+      document.getElementById('extraReminderTime').value = defRem.time;
+      document.getElementById('extraReminderFields').classList.add('hidden');
       setExtraModalCat(presetCat);
       setExtraModalPrio(presetCat === 'امتحان' ? 'high' : 'normal');
       document.getElementById('extraTaskModal').classList.remove('hidden');
@@ -4698,6 +5162,21 @@
       document.getElementById('extraDateInput').value = item.date;
       document.getElementById('extraTimeInput').value = item.time || '';
       document.getElementById('extraNoteInput').value = item.note || '';
+      const remToggle = document.getElementById('extraReminderToggle');
+      const remFields = document.getElementById('extraReminderFields');
+      if (item.reminderAt && !isNaN(new Date(item.reminderAt).getTime())) {
+        const rd = new Date(item.reminderAt);
+        remToggle.checked = true;
+        remFields.classList.remove('hidden');
+        document.getElementById('extraReminderDate').value = formatDateKey(rd);
+        document.getElementById('extraReminderTime').value = `${String(rd.getHours()).padStart(2, '0')}:${String(rd.getMinutes()).padStart(2, '0')}`;
+      } else {
+        const defRem = getDefaultReminderDateTime(item.date);
+        remToggle.checked = false;
+        remFields.classList.add('hidden');
+        document.getElementById('extraReminderDate').value = defRem.date;
+        document.getElementById('extraReminderTime').value = defRem.time;
+      }
       setExtraModalCat(item.category || 'مهمة سريعة');
       setExtraModalPrio(item.priority || 'normal');
       document.getElementById('extraTaskModal').classList.remove('hidden');
@@ -4988,6 +5467,7 @@
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${ec.bg} ${ec.text} border ${ec.border}">${ec.label}</span>
                   ${e.time ? `<span class="text-[10px] text-cyan-300 font-bold">${formatTime12Ar(e.time)}</span>` : `<span class="text-[10px] text-slate-500">طوال اليوم</span>`}
                   ${e.priority === 'high' ? `<span class="text-[10px] text-rose-300">🔥</span>` : ''}
+                  ${renderReminderBadgeHtml(e)}
                 </div>
                 <div class="text-xs font-extrabold mt-1 ${isDone ? 'line-through text-emerald-300/70' : 'text-white'}">${escapeHtml(e.title)}</div>
               </div>
@@ -5893,6 +6373,16 @@
         if (!title || !date) return;
 
         const editId = document.getElementById('extraEditId').value;
+        let reminderAt = null;
+        if (document.getElementById('extraReminderToggle').checked) {
+          const rDate = document.getElementById('extraReminderDate').value || date;
+          const rTime = document.getElementById('extraReminderTime').value || '09:00';
+          const [ry, rm, rd] = rDate.split('-').map(Number);
+          const [rh, rmin] = rTime.split(':').map(Number);
+          const rObj = new Date(ry, (rm || 1) - 1, rd || 1, rh || 0, rmin || 0, 0);
+          if (!isNaN(rObj.getTime())) reminderAt = rObj.toISOString();
+        }
+
         const payload = {
           title,
           date,
@@ -5900,14 +6390,19 @@
           category: document.getElementById('extraCategoryValue').value || 'مهمة سريعة',
           priority: document.getElementById('extraPriorityValue').value || 'normal',
           note: document.getElementById('extraNoteInput').value.trim(),
+          reminderAt
         };
 
         if (editId) {
           const idx = state.extraTasks.findIndex(x => x.id === editId);
-          if (idx >= 0) state.extraTasks[idx] = { ...state.extraTasks[idx], ...payload, updatedAt: Date.now() };
+          if (idx >= 0) {
+            const prev = state.extraTasks[idx];
+            const keepFired = prev.reminderAt && prev.reminderAt === reminderAt ? Boolean(prev.reminderFired) : false;
+            state.extraTasks[idx] = { ...prev, ...payload, reminderFired: keepFired, updatedAt: Date.now() };
+          }
           showToast('تم تعديل الموعد بنجاح ✓', 'emerald');
         } else {
-          state.extraTasks.push({ id: 'ext_' + Date.now(), status: 'pending', updatedAt: Date.now(), ...payload });
+          state.extraTasks.push({ id: 'ext_' + Date.now(), status: 'pending', reminderFired: false, updatedAt: Date.now(), ...payload });
           showToast('تمت الإضافة للرادار والتقويم بنجاح 🎯', 'emerald');
         }
 
@@ -6035,6 +6530,7 @@
           document.getElementById('libraryModal').classList.add('hidden');
           document.getElementById('blockModal').classList.add('hidden');
           document.getElementById('importModal').classList.add('hidden');
+          App.Alerts.closePanel();
           closeConfirmModal();
         }
       });
@@ -6223,7 +6719,47 @@
         showToast(state.calmMode ? 'تم تفعيل الوضع الهادي 🌙' : 'تمت العودة للوضع الكامل ☀️', 'cyan');
       });
 
-      document.getElementById('btnAlertsToggle').addEventListener('click', () => App.Alerts.toggle());
+      document.getElementById('btnAlertsToggle').addEventListener('click', () => App.Alerts.openPanel());
+      document.getElementById('btnOpenAlertsEditor').addEventListener('click', () => App.Alerts.openPanel());
+      document.getElementById('btnCloseAlertsModal').addEventListener('click', () => App.Alerts.closePanel());
+      document.getElementById('btnDoneAlertsModal').addEventListener('click', () => App.Alerts.closePanel());
+      document.getElementById('alertsModal').addEventListener('click', e => {
+        if (e.target.id === 'alertsModal') App.Alerts.closePanel();
+      });
+
+      document.getElementById('alertMasterToggle').addEventListener('change', e => App.Alerts.setMasterEnabled(e.target.checked));
+      document.getElementById('btnAlertRequestPerm').addEventListener('click', () => App.Alerts.requestPermission());
+      document.querySelectorAll('.alert-lead-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          App.Alerts.getSettings().leadMinutes = Number(btn.dataset.lead);
+          saveState();
+          App.Alerts.syncUI();
+        });
+      });
+
+      const bindAlertType = (elId, key) => {
+        document.getElementById(elId).addEventListener('change', e => {
+          App.Alerts.getSettings().types[key] = e.target.checked;
+          saveState();
+        });
+      };
+      bindAlertType('alertTypeTransport', 'transport');
+      bindAlertType('alertTypeUniExam', 'uniExam');
+      bindAlertType('alertTypeWork', 'work');
+      bindAlertType('alertTypeStudyPersonal', 'studyPersonal');
+      bindAlertType('alertTypeExtraReminders', 'extraReminders');
+      bindAlertType('alertTypeZenComplete', 'zenComplete');
+
+      document.getElementById('alertSoundToggle').addEventListener('change', e => {
+        App.Alerts.getSettings().sound = e.target.checked;
+        saveState();
+      });
+      document.getElementById('btnAlertTestNow').addEventListener('click', () => App.Alerts.sendTestNotification());
+
+      document.getElementById('extraReminderToggle').addEventListener('change', e => {
+        document.getElementById('extraReminderFields').classList.toggle('hidden', !e.target.checked);
+      });
+
       document.getElementById('btnExportWeeklyICS').addEventListener('click', () => App.Alerts.exportWeeklyScheduleICS());
 
       // Self-Updater (App.Updater) Controls
@@ -6256,7 +6792,16 @@
       document.getElementById('btnUpdReloadNow').addEventListener('click', () => App.Updater.reloadWithFreshSW());
 
       // Cloud Auto-Sync (Private GitHub Gist) Controls
-      document.getElementById('headerSyncPill').addEventListener('click', () => App.Sync.syncNow({ silent: false }));
+      document.getElementById('headerSyncPill').addEventListener('click', () => {
+        const statusMap = {
+          synced: '🟢 متزامن سحابياً' + (App.Sync.lastSyncLabel ? ` (آخر مزامنة: ${App.Sync.lastSyncLabel})` : ''),
+          syncing: '🔄 جاري المزامنة الآن...',
+          offline: '☁️ أوفلاين — سيزامن تلقائياً عند عودة النت',
+          error: '⚠️ خطأ في آخر محاولة مزامنة — جارٍ إعادة المحاولة...'
+        };
+        showToast(statusMap[App.Sync.status] || '🔄 جارٍ المزامنة...', 'cyan');
+        App.Sync.syncNow({ silent: false });
+      });
       document.getElementById('btnToggleSyncToken').addEventListener('click', () => {
         const inp = document.getElementById('syncTokenInput');
         inp.type = inp.type === 'password' ? 'text' : 'password';
